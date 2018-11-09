@@ -243,8 +243,8 @@
         
             
                 <li class="post-action">
-                    <a class="post-action-btn btn btn--default" href="#gitment">
-                         <i class="fa fa-comment"></i>
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
                     </a>
                 </li>
             
@@ -263,7 +263,9 @@
         
         
             
-                <div id="gitment"></div>
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
             
         
     </div>
@@ -320,34 +322,22 @@
 <!--SCRIPTS END-->
 
     
-        <script type="text/javascript">
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://mrswolf.github.io/about/index.html';
+                 
+                    this.page.identifier = 'about/index.html';
+                 
+             };
             (function() {
-                function render() {
-                    new Gitment({
-                        id: 'https://mrswolf.github.io/about/index.html',
-                        owner: 'Mrswolf',
-                        repo: 'Mrswolf.github.io',
-                        oauth: {
-                            client_id: 'ffa700207f4db1e2f0a6',
-                            client_secret: '4f95101d6d929d84b87841088183e7784ecad991',
-                        }
-                    }).render('gitment');
-                }
-                var gc = document.createElement('script');
-                gc.type = 'text/javascript';
-                gc.src = '//imsun.github.io/gitment/dist/gitment.browser.js';
-                gc.charset = 'UTF-8';
-                gc.onload = render;
-                gc.async = true;
-                document.querySelector('body').appendChild(gc);
-                var gcs = document.createElement('link');
-                gcs.href = '//imsun.github.io/gitment/style/default.css';
-                gcs.type = 'text/css';
-                gcs.rel = 'stylesheet';
-                gcs.media = 'screen,print';
-                document.querySelector('head').appendChild(gcs);
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'mrswolf-github-io';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
             })();
-	    </script>
+        </script>
     
 
 
