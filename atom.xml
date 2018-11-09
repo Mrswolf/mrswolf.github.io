@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>swolf的博客</title>
+  
+  <subtitle>记录我的学习生活</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://Mrswolf.github.io/"/>
+  <updated>2018-11-09T13:05:59.344Z</updated>
+  <id>http://Mrswolf.github.io/</id>
+  
+  <author>
+    <name>swolf</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>博客测试</title>
+    <link href="http://Mrswolf.github.io/zh-cn/2018/11/09/%E5%8D%9A%E5%AE%A2%E6%B5%8B%E8%AF%95/"/>
+    <id>http://Mrswolf.github.io/zh-cn/2018/11/09/博客测试/</id>
+    <published>2018-11-09T13:03:15.000Z</published>
+    <updated>2018-11-09T13:05:59.344Z</updated>
+    
+    <content type="html"><![CDATA[<p>本博客记录我在学习过程中的心得</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;本博客记录我在学习过程中的心得&lt;/p&gt;
+
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+</feed>
