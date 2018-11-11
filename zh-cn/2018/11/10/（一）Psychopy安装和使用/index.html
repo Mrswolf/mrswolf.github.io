@@ -1,0 +1,442 @@
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="swolf的博客">
+    <title>（一）Psychopy安装和使用 - swolf的博客</title>
+    <meta name="author" content="swolf">
+    
+        <meta name="keywords" content="脑机接口,神经科学,机器学习,psychopy,刺激界面">
+    
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"swolf","sameAs":["/about","https://github.com/Mrswolf"],"image":"avatar0.jpg"},"articleBody":"什么是PsychopyPsychopy是基于Python的心理学实验设计软件，由英国诺丁汉大学的Jon Peirce主持开发。Psychopy结合了OpenGL的图形优势和Python的语法特性，给科学家们提供了快速构建高性能的图形刺激界面的工具。\n我为什么选择Psychopy在我研究生阶段，我做脑机接口实验编写刺激界面的工具主要是Matlab平台的Psychtoolbox。很早之前，我也用过e-Prime，但很快就放弃了。e-Prime提供GUI界面，简单易学，但是无法设计复杂的刺激界面。相比之下，Psychtoolbox能够实现大多数脑-机接口刺激界面，同时基于Matlab平台，集成了大量简单方便的函数，对科研人员的编程要求不高，基本上是科研人员的第一选择。\n然而对我而言，我一直不喜欢Matlab，理由有三：\n\nMatlab不是一门真正的通用编程语言。Matlab本质是为不懂CS的科研人员设计的编程语言，很难进行普通程序的开发，例如GUI、网络编程等等。脑机接口一个很重要的方面是开发和机器交互的程序，这些程序有时很注重性能，Matlab开发这些功能不太方便。\nMatlab是收费的商业软件，其工具包的价格不是穷学生能承受的。尽管天朝存在“破解版”这种Matlab版本，MathWorks公司对科研人员使用破解版也视而不见，但谁知道以后会怎么样呢？为了不受制于人，我决定转向开源软件阵营。\n最重要的一点，学Matlab找不到工作。研究生转博士期间，我也跟着校招参加了不少面试。很遗憾，在脑机接口领域，对口的工作几乎没有；就算扩大了从生物医学工程专业来说，大部分工作机会还是集中在医疗图像领域。这些领域的招聘要求中可没有熟练使用Matlab这一项，大部分还是C/C++、Java等通用编程语言。\n\n综上所述，我在博士阶段毅然决然的放弃了Matlab，放弃了以前所有的代码，转向了Python。而在Python平台下，Psychopy几乎是唯一选择（个人认为）。Psychopy目前虽然仍处在开发阶段，还有不少bug，官方文档也不完善，但是官方社区和开发者相当活跃，使用人数也越来越多，借着Python语言的上升势头，我认为不久之后Psychopy很可能成为科研工作者的首选。\n当然由于Psychopy还很年轻，我在Psychopy实践过程中遇到许多问题。写Psychopy系列博文的目的是记录我的开发经验，给想使用Psyhcopy却遇到问题的朋友提供帮助。\nAnaconda和Psychopy安装Anaconda是一个用于科学计算的Python发行版，集成了大量Python科学计算所需的环境库，提供包管理和环境管理的功能，免去了手动安装Python及其各种工具包的麻烦。Anaconda支持Linux、Mac和Windows系统，在Windows下几乎是科学计算的唯一选择。目前最新的版本是Anaconda 5.3，支持Python3.7，我推荐安装最新版本。Anaconda的下载地址可在其官网或清华TUNA镜像站找到。\nAnaconda安装完成后，在其Anaconda Prompt中运行如下命令即可完成Psychopy的安装pip install psychopy\n\n官方文档没有及时更新，其安装步骤还是基于Python2的老版本。Psychopy在2018年7月发布1.90.3版本，宣布支持Python3，安装过程也大为简化，直接使用pip即可安装完成，Windows平台下如果安装过程中报错，很可能是缺少C++编译器，需要先安装Visual Studio及C++开发环境。\n\n使用PsychopyPsychopy提供两种刺激界面设计方式，一种是类似e-Prime的GUI界面Builder，另一种是普通的脚本编写方式Coder。\nBuilder在Anaconda Prompt中切换到Psychopy的app安装目录，Windows下通常为cd %Anaconda的安装目录%\\Anaconda\\Lib\\site-packages\\psychopy\\app，在该目录下运行命令python psychopyApp.py -bBuilder的使用在Builder - building experiments in a GUI文档中有详细的介绍，builder很适合设计一些简单的刺激界面，设计完成的界面也可以转换为Coder中的脚本程序。\nCoder在Anaconda Prompt中切换到Psychopy的app安装目录，Windows下通常为%Anaconda的安装目录%\\Anaconda\\Lib\\site-packages\\psychopy\\app，在该目录下运行命令python psychopyApp.py -cCoder的使用在Coder - writing experiments with scripts文档中有详细的介绍，相比Builder，Coder提供的编程设计方式更加灵活，可以实现更为复杂的刺激界面。当然Coder本身只是提供了开发环境，脚本编写可以在任何编辑器下进行，我很少直接使用Coder，通常会使用Pycharm和Sublime Text来编写程序。\nPsychopy相关资源Psychopy的官方文档更新不算及时，大部分文档还是基于Python2的版本，但其官方文档和demo仍然是学习Psychopy的不二之选。如果有问题在官方文档里没有说明，Google也没有相关信息的话，可以去Psychopy的论坛或Jon Peirce的Github提问。\nPsychopy 官方文档Psychopy API手册Psychopy 论坛Psychopy Github仓库\n","dateCreated":"2018-11-10T20:59:35+08:00","dateModified":"2018-11-11T17:08:45+08:00","datePublished":"2018-11-10T20:59:35+08:00","description":"什么是PsychopyPsychopy是基于Python的心理学实验设计软件，由英国诺丁汉大学的Jon Peirce主持开发。Psychopy结合了OpenGL的图形优势和Python的语法特性，给科学家们提供了快速构建高性能的图形刺激界面的工具。","headline":"（一）Psychopy安装和使用","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mrswolf.github.io/zh-cn/2018/11/10/（一）Psychopy安装和使用/"},"publisher":{"@type":"Organization","name":"swolf","sameAs":["/about","https://github.com/Mrswolf"],"image":"avatar0.jpg","logo":{"@type":"ImageObject","url":"avatar0.jpg"}},"url":"https://mrswolf.github.io/zh-cn/2018/11/10/（一）Psychopy安装和使用/","keywords":"psychopy"}</script>
+    <meta name="description" content="什么是PsychopyPsychopy是基于Python的心理学实验设计软件，由英国诺丁汉大学的Jon Peirce主持开发。Psychopy结合了OpenGL的图形优势和Python的语法特性，给科学家们提供了快速构建高性能的图形刺激界面的工具。">
+<meta name="keywords" content="psychopy,刺激界面">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="（一）Psychopy安装和使用">
+<meta property="og:url" content="https://mrswolf.github.io/zh-cn/2018/11/10/（一）Psychopy安装和使用/index.html">
+<meta property="og:site_name" content="swolf的博客">
+<meta property="og:description" content="什么是PsychopyPsychopy是基于Python的心理学实验设计软件，由英国诺丁汉大学的Jon Peirce主持开发。Psychopy结合了OpenGL的图形优势和Python的语法特性，给科学家们提供了快速构建高性能的图形刺激界面的工具。">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:image" content="https://mrswolf.github.io/zh-cn/2018/11/10/（一）Psychopy安装和使用/builder.png">
+<meta property="og:image" content="https://mrswolf.github.io/zh-cn/2018/11/10/（一）Psychopy安装和使用/coder.png">
+<meta property="og:updated_time" content="2018-11-11T09:08:45.404Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="（一）Psychopy安装和使用">
+<meta name="twitter:description" content="什么是PsychopyPsychopy是基于Python的心理学实验设计软件，由英国诺丁汉大学的Jon Peirce主持开发。Psychopy结合了OpenGL的图形优势和Python的语法特性，给科学家们提供了快速构建高性能的图形刺激界面的工具。">
+<meta name="twitter:image" content="https://mrswolf.github.io/zh-cn/2018/11/10/（一）Psychopy安装和使用/builder.png">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://mrswolf.github.io/assets/images/avatar0.jpg"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-du2xmrqdqrl2ollgeiw050kpl6l4nbyz7bumjuurjgsxyopifvukebxc9lqe.min.css">
+    <!--STYLES END-->
+    
+
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="5">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">swolf的博客</a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about">
+        
+        
+            <img class="header-picture" src="/assets/images/avatar0.jpg" alt="作者的图片">
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="5">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar0.jpg" alt="作者的图片">
+                </a>
+                <h4 class="sidebar-profile-name">swolf</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>生物医学工程在读博士，主要研究方向为脑机接口、机器学习和神经科学理论</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/ " title="首页">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">首页</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="分类">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">分类</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="标签">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">标签</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="归档">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">归档</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/about" title="关于我">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">关于我</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/Mrswolf" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="5"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            （一）Psychopy安装和使用
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2018-11-10T20:59:35+08:00">
+	
+		    11月 10, 2018
+    	
+    </time>
+    
+        <span>发布在 </span>
+        
+    <a class="category-link" href="/categories/psychopy系列/">psychopy系列</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <h2 id="什么是Psychopy"><a href="#什么是Psychopy" class="headerlink" title="什么是Psychopy"></a>什么是Psychopy</h2><p>Psychopy是基于Python的心理学实验设计软件，由英国诺丁汉大学的Jon Peirce主持开发。Psychopy结合了OpenGL的图形优势和Python的语法特性，给科学家们提供了快速构建高性能的图形刺激界面的工具。<br><a id="more"></a></p>
+<h2 id="我为什么选择Psychopy"><a href="#我为什么选择Psychopy" class="headerlink" title="我为什么选择Psychopy"></a>我为什么选择Psychopy</h2><p>在我研究生阶段，我做脑机接口实验编写刺激界面的工具主要是Matlab平台的Psychtoolbox。很早之前，我也用过e-Prime，但很快就放弃了。e-Prime提供GUI界面，简单易学，但是无法设计复杂的刺激界面。相比之下，Psychtoolbox能够实现大多数脑-机接口刺激界面，同时基于Matlab平台，集成了大量简单方便的函数，对科研人员的编程要求不高，基本上是科研人员的第一选择。</p>
+<p>然而对我而言，我一直不喜欢Matlab，理由有三：</p>
+<ol>
+<li><strong>Matlab不是一门真正的通用编程语言</strong>。Matlab本质是为不懂CS的科研人员设计的编程语言，很难进行普通程序的开发，例如GUI、网络编程等等。脑机接口一个很重要的方面是开发和机器交互的程序，这些程序有时很注重性能，Matlab开发这些功能不太方便。</li>
+<li><strong>Matlab是收费的商业软件</strong>，其工具包的价格不是穷学生能承受的。尽管天朝存在“破解版”这种Matlab版本，MathWorks公司对科研人员使用破解版也视而不见，但谁知道以后会怎么样呢？为了不受制于人，我决定转向开源软件阵营。</li>
+<li><strong>最重要的一点，学Matlab找不到工作</strong>。研究生转博士期间，我也跟着校招参加了不少面试。很遗憾，在脑机接口领域，对口的工作几乎没有；就算扩大了从生物医学工程专业来说，大部分工作机会还是集中在医疗图像领域。这些领域的招聘要求中可没有熟练使用Matlab这一项，大部分还是C/C++、Java等通用编程语言。</li>
+</ol>
+<p>综上所述，我在博士阶段毅然决然的放弃了Matlab，放弃了以前所有的代码，转向了Python。而在Python平台下，Psychopy几乎是唯一选择（个人认为）。Psychopy目前虽然仍处在开发阶段，还有不少bug，官方文档也不完善，但是官方社区和开发者相当活跃，使用人数也越来越多，借着Python语言的上升势头，我认为不久之后Psychopy很可能成为科研工作者的首选。</p>
+<p>当然由于Psychopy还很年轻，我在Psychopy实践过程中遇到许多问题。写Psychopy系列博文的目的是记录我的开发经验，给想使用Psyhcopy却遇到问题的朋友提供帮助。</p>
+<h2 id="Anaconda和Psychopy安装"><a href="#Anaconda和Psychopy安装" class="headerlink" title="Anaconda和Psychopy安装"></a>Anaconda和Psychopy安装</h2><p>Anaconda是一个用于科学计算的Python发行版，集成了大量Python科学计算所需的环境库，提供包管理和环境管理的功能，免去了手动安装Python及其各种工具包的麻烦。Anaconda支持Linux、Mac和Windows系统，在Windows下几乎是科学计算的唯一选择。目前最新的版本是Anaconda 5.3，支持Python3.7，我推荐安装最新版本。Anaconda的下载地址可在其<a href="https://www.anaconda.com/download/" target="_blank" rel="noopener">官网</a>或<a href="https://mirrors.tuna.tsinghua.edu.cn/anaconda/archive/" target="_blank" rel="noopener">清华TUNA镜像站</a>找到。</p>
+<p>Anaconda安装完成后，在其Anaconda Prompt中运行如下命令即可完成Psychopy的安装<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pip install psychopy</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>官方文档没有及时更新，其安装步骤还是基于Python2的老版本。Psychopy在2018年7月发布1.90.3版本，宣布支持Python3，安装过程也大为简化，直接使用pip即可安装完成，Windows平台下如果安装过程中报错，很可能是缺少C++编译器，需要先安装Visual Studio及C++开发环境。</p>
+</blockquote>
+<h2 id="使用Psychopy"><a href="#使用Psychopy" class="headerlink" title="使用Psychopy"></a>使用Psychopy</h2><p>Psychopy提供两种刺激界面设计方式，一种是类似e-Prime的GUI界面Builder，另一种是普通的脚本编写方式Coder。</p>
+<h3 id="Builder"><a href="#Builder" class="headerlink" title="Builder"></a>Builder</h3><p>在Anaconda Prompt中切换到Psychopy的app安装目录，Windows下通常为<code>cd %Anaconda的安装目录%\Anaconda\Lib\site-packages\psychopy\app</code>，在该目录下运行命令<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">python psychopyApp.py -b</span><br></pre></td></tr></table></figure><br><img src="/zh-cn/2018/11/10/（一）Psychopy安装和使用/builder.png" title="Builder界面"><br>Builder的使用在<a href="http://www.psychopy.org/builder/builder.html" target="_blank" rel="noopener">Builder - building experiments in a GUI</a>文档中有详细的介绍，builder很适合设计一些简单的刺激界面，设计完成的界面也可以转换为Coder中的脚本程序。</p>
+<h3 id="Coder"><a href="#Coder" class="headerlink" title="Coder"></a>Coder</h3><p>在Anaconda Prompt中切换到Psychopy的app安装目录，Windows下通常为<code>%Anaconda的安装目录%\Anaconda\Lib\site-packages\psychopy\app</code>，在该目录下运行命令<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">python psychopyApp.py -c</span><br></pre></td></tr></table></figure><br><img src="/zh-cn/2018/11/10/（一）Psychopy安装和使用/coder.png" title="Coder界面"><br>Coder的使用在<a href="http://www.psychopy.org/coder/coder.html" target="_blank" rel="noopener">Coder - writing experiments with scripts</a>文档中有详细的介绍，相比Builder，Coder提供的编程设计方式更加灵活，可以实现更为复杂的刺激界面。当然Coder本身只是提供了开发环境，脚本编写可以在任何编辑器下进行，我很少直接使用Coder，通常会使用Pycharm和Sublime Text来编写程序。</p>
+<h2 id="Psychopy相关资源"><a href="#Psychopy相关资源" class="headerlink" title="Psychopy相关资源"></a>Psychopy相关资源</h2><p>Psychopy的官方文档更新不算及时，大部分文档还是基于Python2的版本，但其官方文档和demo仍然是学习Psychopy的不二之选。如果有问题在官方文档里没有说明，Google也没有相关信息的话，可以去Psychopy的论坛或Jon Peirce的Github提问。</p>
+<p><a href="https://discourse.psychopy.org/" target="_blank" rel="noopener">Psychopy 官方文档</a><br><a href="http://www.psychopy.org/api/api.html" target="_blank" rel="noopener">Psychopy API手册</a><br><a href="https://discourse.psychopy.org/" target="_blank" rel="noopener">Psychopy 论坛</a><br><a href="https://github.com/psychopy/psychopy" target="_blank" rel="noopener">Psychopy Github仓库</a></p>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">标签</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/psychopy/">psychopy</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/zh-cn/2018/11/09/博客测试/" data-tooltip="博客测试" aria-label="下一篇: 博客测试">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2018 swolf. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="5">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/zh-cn/2018/11/09/博客测试/" data-tooltip="博客测试" aria-label="下一篇: 博客测试">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                <div id="share-options-bar" class="share-options-bar" data-behavior="5">
+    <i id="btn-close-shareoptions" class="fa fa-times"></i>
+    <ul class="share-options">
+        
+    </ul>
+</div>
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar0.jpg" alt="作者的图片">
+        
+            <h4 id="about-card-name">swolf</h4>
+        
+            <div id="about-card-bio"><p>生物医学工程在读博士，主要研究方向为脑机接口、机器学习和神经科学理论</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>目前失业中…</p>
+
+            </div>
+        
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cyberpunk.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-vufjrm3fmbuttogo1hxuu0w9w0sesk5iyysjuguc2hdhufot9szxg8twijry.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://mrswolf.github.io/zh-cn/2018/11/10/（一）Psychopy安装和使用/';
+                 
+                    this.page.identifier = 'zh-cn/2018/11/10/（一）Psychopy安装和使用/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'mrswolf-github-io';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+
+
+
+    </body>
+</html>
