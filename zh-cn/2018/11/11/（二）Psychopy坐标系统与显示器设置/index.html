@@ -1,0 +1,465 @@
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+    
+<head>
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="swolf的博客">
+    <title>（二）Psychopy坐标系统与显示器设置 - swolf的博客</title>
+    <meta name="author" content="swolf">
+    
+        <meta name="keywords" content="脑机接口,神经科学,机器学习,psychopy,坐标系统,显示器设置">
+    
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"swolf","sameAs":["/about","https://github.com/Mrswolf"],"image":"avatar0.jpg"},"articleBody":"\nPsychopy的坐标系统Psychopy提供了5种不同的坐标单位(unit)，使用者只需提供刺激对应的坐标单位，Psychopy会自动计算刺激所对应的像素点范围。这种多坐标单位的好处在于，能够开发和设备无关的刺激呈现，不需要每次实验都对刺激的大小和呈现位置进行调整。其劣势则是需要精心挑选刺激对应的坐标单位，有时还要在不同单位间进行转换，一不小心就容易出错。无论何种单位，Psychopy的坐标系统始终以屏幕中心为原点(0, 0)，原点向上为正y轴，原点向右为正x轴。不同的Psychopy坐标单位的所需参考对象不同，例如norm、height的坐标单位是针对视窗对象(window)，而cm、deg、degFlat、degFlatPos、pix则是针对屏幕(screen)。\n归一化单位(norm)归一化单位可能是最常用的单位之一。在该单位下，window左下角坐标为(-1, -1)，window右上角坐标为(1, 1)。如图为长宽均为0.5的三个色块，其中心点分别位于(-0,5, 0)、(0, 0)和(0.5, 0)坐标下，注意window的分辨率为800*600，因此尽管色块的归一化长宽均为0.5，但其长实际为200像素点，宽实际为150像素点，表现为长方形。\n像素单位(pix)像素单位的坐标范围取决于screen的宽、高像素点数，假设screen宽度有w个像素点，高度有h个像素点，则screen左下角坐标为(-w/2, -h/2)，右上角坐标为(w/2, h/2)。\n厘米单位(cm)厘米单位的坐标范围取决于screen的宽度和高度，假设screen宽度为w厘米，高度为h厘米，则screen左下角坐标为(-w/2, -h/2)，右上角坐标为(w/2, h/2)，每cm所代表的像素长度则由screen的像素点数确定。\n高度单位(height)高度单位的坐标范围取决于window的宽高比。无论何种window，y轴的坐标范围始终是从-0.5到0.5。因此，如果window是4：3的尺寸，则window左下角坐标为(-0.6667, -0.5)，window右上角坐标为(0.6667, 0.5)；如果是16：9的尺寸，则window左下角坐标为(-0.8, -0.5)，window右上角坐标为(0.8, 0.5)。如图是800*600的window，色块的长宽均为1，则色块会占满y轴方向的所有空间。\n视角(deg, degFlatPos, degFlat)视角单位是五种单位种最复杂的坐标单位，使用该单位，不仅要知道屏幕的大小、像素点的多少，还要知道被试距离屏幕的距离，Psychopy提供三种不同的视角单位deg、degFlatPos和degFlat。\ndegdeg单位默认视角在screen所有位置具有相同的像素长度，即在screen边缘位置和中心位置会产生相同大小的刺激图形。采用deg单位可以认为screen是球形曲面，而人眼则是球心，每度视角在screen所投射的像素长度完全相同。上图deg行红绿蓝三色块的长宽均为5度，位置分别为(-25, 10)、(0, 10)、(25, 10)。\ndegFlatPosdegFlatPos在deg的基础上考虑了位置在水平屏幕上的修正，远离屏幕中心的位置，刺激间的间隔越大，但是不改变刺激本身的大小。上图degFlatPos行三色块的参数同deg行完全相同，但因为采用了degFlatPos单位，红蓝色块距离绿色色块的距离要比deg行更大。\ndegFlatdegFlat不仅修正了位置信息，还修正了刺激的大小，因此，远离屏幕中心的位置，刺激尺寸越大，刺激间的间隔也越大。上图degFlat行三色块的参数同deg行完全相同，但因为采用了degFlat单位，不仅红蓝色块距离绿色色块的距离要比deg行更大，红蓝色块的形状也产生了畸变。\nPsychopy单位转换Psychopy提供了不同单位间的转换方法，位于psychopy.misc模块中。\nPsychopy显示器信息设置以上提到的pix、cm、deg、degFlatPos和degFlag均需要提供显示器信息（尺寸、分辨率等），Psychopy提供两种方式设定显示设备信息。\nMoniter Center界面Anaconda Prompt下切换到%Anaconda的安装目录%\\Anaconda\\Lib\\site-packages\\psychopy\\monitors目录，输入命令python MonitorCenter.py\nMoniter类Moniter类位于psychopy.monitors模块中，负责显示器参数和刺激环境设置。from psychopy import monitorsmon = monitors.Monitor(    name='my_monitor',    width=53.704,  # 显示器宽度，单位cm    distance=45,   # 被试距显示器距离，单位cm    gamma=1,       # gamma值    verbose=False) # 是否输出详细信息mon.setSizePix((1920, 1080)) # 设置显示器分辨率mon.save() # 保存显示器信息Monitor.save()函数保存的显示器信息位于C:\\Users\\%USER_NAME%\\AppData\\Roaming\\psychopy2\\monitors文件夹下，文件格式为JSON。\n","dateCreated":"2018-11-11T21:20:16+08:00","dateModified":"2018-11-15T14:23:46+08:00","datePublished":"2018-11-11T21:20:16+08:00","description":"\nPsychopy的坐标系统Psychopy提供了5种不同的坐标单位(unit)，使用者只需提供刺激对应的坐标单位，Psychopy会自动计算刺激所对应的像素点范围。这种多坐标单位的好处在于，能够开发和设备无关的刺激呈现，不需要每次实验都对刺激的大小和呈现位置进行调整。其劣势则是需要精心挑选刺激对应的坐标单位，有时还要在不同单位间进行转换，一不小心就容易出错。","headline":"（二）Psychopy坐标系统与显示器设置","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mrswolf.github.io/zh-cn/2018/11/11/（二）Psychopy坐标系统与显示器设置/"},"publisher":{"@type":"Organization","name":"swolf","sameAs":["/about","https://github.com/Mrswolf"],"image":"avatar0.jpg","logo":{"@type":"ImageObject","url":"avatar0.jpg"}},"url":"https://mrswolf.github.io/zh-cn/2018/11/11/（二）Psychopy坐标系统与显示器设置/","keywords":"psychopy"}</script>
+    <meta name="description" content="Psychopy的坐标系统Psychopy提供了5种不同的坐标单位(unit)，使用者只需提供刺激对应的坐标单位，Psychopy会自动计算刺激所对应的像素点范围。这种多坐标单位的好处在于，能够开发和设备无关的刺激呈现，不需要每次实验都对刺激的大小和呈现位置进行调整。其劣势则是需要精心挑选刺激对应的坐标单位，有时还要在不同单位间进行转换，一不小心就容易出错。">
+<meta name="keywords" content="psychopy,坐标系统,显示器设置">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="（二）Psychopy坐标系统与显示器设置">
+<meta property="og:url" content="https://mrswolf.github.io/zh-cn/2018/11/11/（二）Psychopy坐标系统与显示器设置/index.html">
+<meta property="og:site_name" content="swolf的博客">
+<meta property="og:description" content="Psychopy的坐标系统Psychopy提供了5种不同的坐标单位(unit)，使用者只需提供刺激对应的坐标单位，Psychopy会自动计算刺激所对应的像素点范围。这种多坐标单位的好处在于，能够开发和设备无关的刺激呈现，不需要每次实验都对刺激的大小和呈现位置进行调整。其劣势则是需要精心挑选刺激对应的坐标单位，有时还要在不同单位间进行转换，一不小心就容易出错。">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:image" content="https://mrswolf.github.io/zh-cn/2018/11/11/（二）Psychopy坐标系统与显示器设置/coordinate.png">
+<meta property="og:image" content="https://mrswolf.github.io/zh-cn/2018/11/11/（二）Psychopy坐标系统与显示器设置/norm.png">
+<meta property="og:image" content="https://mrswolf.github.io/zh-cn/2018/11/11/（二）Psychopy坐标系统与显示器设置/height.png">
+<meta property="og:image" content="https://mrswolf.github.io/zh-cn/2018/11/11/（二）Psychopy坐标系统与显示器设置/deg.png">
+<meta property="og:image" content="https://mrswolf.github.io/zh-cn/2018/11/11/（二）Psychopy坐标系统与显示器设置/monitor_center.png">
+<meta property="og:updated_time" content="2018-11-15T06:23:46.909Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="（二）Psychopy坐标系统与显示器设置">
+<meta name="twitter:description" content="Psychopy的坐标系统Psychopy提供了5种不同的坐标单位(unit)，使用者只需提供刺激对应的坐标单位，Psychopy会自动计算刺激所对应的像素点范围。这种多坐标单位的好处在于，能够开发和设备无关的刺激呈现，不需要每次实验都对刺激的大小和呈现位置进行调整。其劣势则是需要精心挑选刺激对应的坐标单位，有时还要在不同单位间进行转换，一不小心就容易出错。">
+<meta name="twitter:image" content="https://mrswolf.github.io/zh-cn/2018/11/11/（二）Psychopy坐标系统与显示器设置/coordinate.png">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://mrswolf.github.io/assets/images/avatar0.jpg"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-du2xmrqdqrl2ollgeiw050kpl6l4nbyz7bumjuurjgsxyopifvukebxc9lqe.min.css">
+    <!--STYLES END-->
+    
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-129079661-1', 'auto');
+        ga('send', 'pageview');
+    </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+    
+</head>
+
+    <body>
+        <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="5">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">swolf的博客</a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about">
+        
+        
+            <img class="header-picture" src="/assets/images/avatar0.jpg" alt="作者的图片">
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="5">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar0.jpg" alt="作者的图片">
+                </a>
+                <h4 class="sidebar-profile-name">swolf</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>生物医学工程在读博士，主要研究方向为脑机接口、机器学习和神经科学理论</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/ " title="首页">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">首页</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="分类">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">分类</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="标签">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">标签</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="归档">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">归档</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/about" title="关于我">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">关于我</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/Mrswolf" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="5"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            （二）Psychopy坐标系统与显示器设置
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2018-11-11T21:20:16+08:00">
+	
+		    11月 11, 2018
+    	
+    </time>
+    
+        <span>发布在 </span>
+        
+    <a class="category-link" href="/categories/psychopy系列/">psychopy系列</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <h1 id="table-of-contents">目录</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Psychopy的坐标系统"><span class="toc-text">Psychopy的坐标系统</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#归一化单位-norm"><span class="toc-text">归一化单位(norm)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#像素单位-pix"><span class="toc-text">像素单位(pix)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#厘米单位-cm"><span class="toc-text">厘米单位(cm)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#高度单位-height"><span class="toc-text">高度单位(height)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#视角-deg-degFlatPos-degFlat"><span class="toc-text">视角(deg, degFlatPos, degFlat)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#deg"><span class="toc-text">deg</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#degFlatPos"><span class="toc-text">degFlatPos</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#degFlat"><span class="toc-text">degFlat</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Psychopy单位转换"><span class="toc-text">Psychopy单位转换</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Psychopy显示器信息设置"><span class="toc-text">Psychopy显示器信息设置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Moniter-Center界面"><span class="toc-text">Moniter Center界面</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Moniter类"><span class="toc-text">Moniter类</span></a></li></ol></li></ol>
+<h2 id="Psychopy的坐标系统"><a href="#Psychopy的坐标系统" class="headerlink" title="Psychopy的坐标系统"></a>Psychopy的坐标系统</h2><p>Psychopy提供了5种不同的坐标单位(unit)，使用者只需提供刺激对应的坐标单位，Psychopy会自动计算刺激所对应的像素点范围。这种多坐标单位的好处在于，能够开发和设备无关的刺激呈现，不需要每次实验都对刺激的大小和呈现位置进行调整。其劣势则是需要精心挑选刺激对应的坐标单位，有时还要在不同单位间进行转换，一不小心就容易出错。<br><a id="more"></a><br>无论何种单位，Psychopy的坐标系统始终以屏幕中心为原点(0, 0)，原点向上为正y轴，原点向右为正x轴。不同的Psychopy坐标单位的所需参考对象不同，例如norm、height的坐标单位是针对视窗对象(window)，而cm、deg、degFlat、degFlatPos、pix则是针对屏幕(screen)。<br><img src="/zh-cn/2018/11/11/（二）Psychopy坐标系统与显示器设置/coordinate.png" title="坐标系统"></p>
+<h3 id="归一化单位-norm"><a href="#归一化单位-norm" class="headerlink" title="归一化单位(norm)"></a>归一化单位(norm)</h3><p>归一化单位可能是最常用的单位之一。在该单位下，window左下角坐标为(-1, -1)，window右上角坐标为(1, 1)。如图为长宽均为0.5的三个色块，其中心点分别位于(-0,5, 0)、(0, 0)和(0.5, 0)坐标下，注意window的分辨率为800*600，因此尽管色块的归一化长宽均为0.5，但其长实际为200像素点，宽实际为150像素点，表现为长方形。<br><img src="/zh-cn/2018/11/11/（二）Psychopy坐标系统与显示器设置/norm.png" title="norm单位"></p>
+<h3 id="像素单位-pix"><a href="#像素单位-pix" class="headerlink" title="像素单位(pix)"></a>像素单位(pix)</h3><p>像素单位的坐标范围取决于screen的宽、高像素点数，假设screen宽度有w个像素点，高度有h个像素点，则screen左下角坐标为(-w/2, -h/2)，右上角坐标为(w/2, h/2)。</p>
+<h3 id="厘米单位-cm"><a href="#厘米单位-cm" class="headerlink" title="厘米单位(cm)"></a>厘米单位(cm)</h3><p>厘米单位的坐标范围取决于screen的宽度和高度，假设screen宽度为w厘米，高度为h厘米，则screen左下角坐标为(-w/2, -h/2)，右上角坐标为(w/2, h/2)，每cm所代表的像素长度则由screen的像素点数确定。</p>
+<h3 id="高度单位-height"><a href="#高度单位-height" class="headerlink" title="高度单位(height)"></a>高度单位(height)</h3><p>高度单位的坐标范围取决于window的宽高比。无论何种window，y轴的坐标范围始终是从-0.5到0.5。因此，如果window是4：3的尺寸，则window左下角坐标为(-0.6667, -0.5)，window右上角坐标为(0.6667, 0.5)；如果是16：9的尺寸，则window左下角坐标为(-0.8, -0.5)，window右上角坐标为(0.8, 0.5)。如图是800*600的window，色块的长宽均为1，则色块会占满y轴方向的所有空间。<br><img src="/zh-cn/2018/11/11/（二）Psychopy坐标系统与显示器设置/height.png" title="height单位"></p>
+<h3 id="视角-deg-degFlatPos-degFlat"><a href="#视角-deg-degFlatPos-degFlat" class="headerlink" title="视角(deg, degFlatPos, degFlat)"></a>视角(deg, degFlatPos, degFlat)</h3><p>视角单位是五种单位种最复杂的坐标单位，使用该单位，不仅要知道屏幕的大小、像素点的多少，还要知道被试距离屏幕的距离，Psychopy提供三种不同的视角单位deg、degFlatPos和degFlat。<br><img src="/zh-cn/2018/11/11/（二）Psychopy坐标系统与显示器设置/deg.png" title="视角单位"></p>
+<h4 id="deg"><a href="#deg" class="headerlink" title="deg"></a>deg</h4><p>deg单位默认视角在screen所有位置具有相同的像素长度，即在screen边缘位置和中心位置会产生相同大小的刺激图形。采用deg单位可以认为screen是球形曲面，而人眼则是球心，每度视角在screen所投射的像素长度完全相同。上图deg行红绿蓝三色块的长宽均为5度，位置分别为(-25, 10)、(0, 10)、(25, 10)。</p>
+<h4 id="degFlatPos"><a href="#degFlatPos" class="headerlink" title="degFlatPos"></a>degFlatPos</h4><p>degFlatPos在deg的基础上考虑了位置在水平屏幕上的修正，远离屏幕中心的位置，刺激间的间隔越大，但是不改变刺激本身的大小。上图degFlatPos行三色块的参数同deg行完全相同，但因为采用了degFlatPos单位，红蓝色块距离绿色色块的距离要比deg行更大。</p>
+<h4 id="degFlat"><a href="#degFlat" class="headerlink" title="degFlat"></a>degFlat</h4><p>degFlat不仅修正了位置信息，还修正了刺激的大小，因此，远离屏幕中心的位置，刺激尺寸越大，刺激间的间隔也越大。上图degFlat行三色块的参数同deg行完全相同，但因为采用了degFlat单位，不仅红蓝色块距离绿色色块的距离要比deg行更大，红蓝色块的形状也产生了畸变。</p>
+<h3 id="Psychopy单位转换"><a href="#Psychopy单位转换" class="headerlink" title="Psychopy单位转换"></a>Psychopy单位转换</h3><p>Psychopy提供了不同单位间的转换方法，位于<a href="http://www.psychopy.org/api/misc.html" target="_blank" rel="noopener">psychopy.misc</a>模块中。</p>
+<h2 id="Psychopy显示器信息设置"><a href="#Psychopy显示器信息设置" class="headerlink" title="Psychopy显示器信息设置"></a>Psychopy显示器信息设置</h2><p>以上提到的pix、cm、deg、degFlatPos和degFlag均需要提供显示器信息（尺寸、分辨率等），Psychopy提供两种方式设定显示设备信息。</p>
+<h3 id="Moniter-Center界面"><a href="#Moniter-Center界面" class="headerlink" title="Moniter Center界面"></a>Moniter Center界面</h3><p>Anaconda Prompt下切换到<code>%Anaconda的安装目录%\Anaconda\Lib\site-packages\psychopy\monitors</code>目录，输入命令<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">python MonitorCenter.py</span><br></pre></td></tr></table></figure><br><img src="/zh-cn/2018/11/11/（二）Psychopy坐标系统与显示器设置/monitor_center.png" title="Moniter Center界面"></p>
+<h3 id="Moniter类"><a href="#Moniter类" class="headerlink" title="Moniter类"></a>Moniter类</h3><p>Moniter类位于<a href="http://www.psychopy.org/api/monitors.html" target="_blank" rel="noopener">psychopy.monitors</a>模块中，负责显示器参数和刺激环境设置。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> psychopy <span class="keyword">import</span> monitors</span><br><span class="line">mon = monitors.Monitor(</span><br><span class="line">    name=<span class="string">'my_monitor'</span>,</span><br><span class="line">    width=<span class="number">53.704</span>,  <span class="comment"># 显示器宽度，单位cm</span></span><br><span class="line">    distance=<span class="number">45</span>,   <span class="comment"># 被试距显示器距离，单位cm</span></span><br><span class="line">    gamma=<span class="number">1</span>,       <span class="comment"># gamma值</span></span><br><span class="line">    verbose=<span class="keyword">False</span>) <span class="comment"># 是否输出详细信息</span></span><br><span class="line">mon.setSizePix((<span class="number">1920</span>, <span class="number">1080</span>)) <span class="comment"># 设置显示器分辨率</span></span><br><span class="line">mon.save() <span class="comment"># 保存显示器信息</span></span><br></pre></td></tr></table></figure><br>Monitor.save()函数保存的显示器信息位于<code>C:\Users\%USER_NAME%\AppData\Roaming\psychopy2\monitors</code>文件夹下，文件格式为JSON。</p>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">标签</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/psychopy/">psychopy</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/zh-cn/2018/11/10/（一）Psychopy安装和使用/" data-tooltip="（一）Psychopy安装和使用" aria-label="下一篇: （一）Psychopy安装和使用">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="目录">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2018 swolf. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="5">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/zh-cn/2018/11/10/（一）Psychopy安装和使用/" data-tooltip="（一）Psychopy安装和使用" aria-label="下一篇: （一）Psychopy安装和使用">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="目录">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                <div id="share-options-bar" class="share-options-bar" data-behavior="5">
+    <i id="btn-close-shareoptions" class="fa fa-times"></i>
+    <ul class="share-options">
+        
+    </ul>
+</div>
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar0.jpg" alt="作者的图片">
+        
+            <h4 id="about-card-name">swolf</h4>
+        
+            <div id="about-card-bio"><p>生物医学工程在读博士，主要研究方向为脑机接口、机器学习和神经科学理论</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>目前失业中…</p>
+
+            </div>
+        
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cyberpunk.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-vufjrm3fmbuttogo1hxuu0w9w0sesk5iyysjuguc2hdhufot9szxg8twijry.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://mrswolf.github.io/zh-cn/2018/11/11/（二）Psychopy坐标系统与显示器设置/';
+                 
+                    this.page.identifier = 'zh-cn/2018/11/11/（二）Psychopy坐标系统与显示器设置/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'mrswolf-github-io';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+
+
+
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<!-- <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>
