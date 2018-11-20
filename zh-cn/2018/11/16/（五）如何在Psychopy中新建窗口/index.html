@@ -6,27 +6,28 @@
     <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="swolf的博客">
-    <title>归档: 2018 - swolf的博客</title>
+    <title>（五）如何在Psychopy中新建窗口 - swolf的博客</title>
     <meta name="author" content="swolf">
     
-        <meta name="keywords" content="脑机接口,神经科学,机器学习,swolf,计算机,脑科学,Python,深度学习,">
+        <meta name="keywords" content="脑机接口,神经科学,机器学习,swolf,计算机,脑科学,Python,深度学习,psychopy,窗口">
     
     
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{}</script>
-    <meta name="description" content="欢迎光临，这里是swolf的博客~">
-<meta name="keywords" content="脑机接口,神经科学,机器学习,swolf,计算机,脑科学,Python,深度学习">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"swolf","sameAs":["/about","https://github.com/Mrswolf"],"image":"avatar0.jpg"},"articleBody":"\n新建单窗口窗口(windows)是刺激呈现的舞台，任何刺激对象都需要指定其所属的窗口对象。Pyschopy的Window对象位于psychopy.visual模块中，一个最简单的窗口示例如下from psychopy import visual, event, monitors, coreimport numpy as np# 根据你自己的显示器调整显示器信息mon = monitors.Monitor(    name='my_monitor',    width=53.704,  # 显示器宽度，单位cm    distance=45,   # 被试距显示器距离，单位cm    gamma=None,    # gamma值    verbose=False) # 是否输出详细信息mon.setSizePix((1920, 1080)) # 设置显示器分辨率mon.save() # 保存显示器信息win = visual.Window(monitor=mon, size=(800, 600), fullscr=False,    screen=0, winType='pyglet', units='norm', allowGUI=True)event.waitKeys() # 等待按键# 修复或预防原始gamma不能恢复bug(运行Psychopy程序显示器变暗加入以下代码)origLUT = np.round(win.backend._origGammaRamp * 65535.0).astype(\"uint16\")origLUT = origLUT.byteswap() / 255.0win.backend._origGammaRamp = origLUTcore.quit() # 退出Psychopy程序\nWindow对象用size参数申明窗口尺寸为800*600像素；fullscr参数决定是否全屏显示；screen参数决定了窗口在哪个显示器上显示，通常0是主显示器；winType参数决定了Psychopy使用的后端程序，有’pyglet’和’pygame’两种选择（Psychopy官方未来主要采用pyglet作为后端程序，我推荐采用pyglet）。\n新建多窗口Psychopy也可以同时建立多个窗口对象，注意仅pyglet后端支持多窗口行为。下面的代码展示了如何新建两个位于不同位置的窗口from psychopy import visual, event, monitors, coreimport numpy as np# 根据你自己的显示器调整显示器信息mon = monitors.Monitor(    name='my_monitor',    width=53.704,  # 显示器宽度，单位cm    distance=45,   # 被试距显示器距离，单位cm    gamma=None,    # gamma值    verbose=False) # 是否输出详细信息mon.setSizePix((1920, 1080)) # 设置显示器分辨率mon.save() # 保存显示器信息# 窗口1在屏幕左上角win1 = visual.Window(monitor=mon, size=(800, 600), pos=(0, 0), fullscr=False,    screen=0, winType='pyglet', units='norm', allowGUI=True)# 窗口2在屏幕右下角win2 = visual.Window(monitor=mon, size=(800, 600), pos=(1120, 480), fullscr=False,    screen=0, winType='pyglet', units='norm', allowGUI=True)event.waitKeys() # 等待按键# 修复或预防原始gamma不能恢复bug(运行Psychopy程序显示器变暗加入以下代码)origLUT = np.round(win1.backend._origGammaRamp * 65535.0).astype(\"uint16\")origLUT = origLUT.byteswap() / 255.0win1.backend._origGammaRamp = origLUTwin2.backend._origGammaRamp = origLUTcore.quit() # 退出Psychopy程序\npos参数调整窗口在屏幕上显示的位置，单位始终为像素，这里的坐标系不同于Psychopy的坐标系，以屏幕的左上角为原点，向下和向右分别为y轴和x轴的正方向。Window对象有很多可调整的参数和行为，具体细节可见官方文档Window API\n","dateCreated":"2018-11-16T21:15:22+08:00","dateModified":"2018-11-20T11:00:29+08:00","datePublished":"2018-11-16T21:15:22+08:00","description":"","headline":"（五）如何在Psychopy中新建窗口","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mrswolf.github.io/zh-cn/2018/11/16/（五）如何在Psychopy中新建窗口/"},"publisher":{"@type":"Organization","name":"swolf","sameAs":["/about","https://github.com/Mrswolf"],"image":"avatar0.jpg","logo":{"@type":"ImageObject","url":"avatar0.jpg"}},"url":"https://mrswolf.github.io/zh-cn/2018/11/16/（五）如何在Psychopy中新建窗口/","keywords":"psychopy"}</script>
+    <meta name="description" content="新建单窗口窗口(windows)是刺激呈现的舞台，任何刺激对象都需要指定其所属的窗口对象。Pyschopy的Window对象位于psychopy.visual模块中，一个最简单的窗口示例如下from psychopy import visual, event, monitors, coreimport numpy as np# 根据你自己的显示器调整显示器信息mon = monitors.Mon">
+<meta name="keywords" content="psychopy,窗口">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="swolf的博客">
-<meta property="og:url" content="https://mrswolf.github.io/archives/2018/index.html">
+<meta property="og:title" content="（五）如何在Psychopy中新建窗口">
+<meta property="og:url" content="https://mrswolf.github.io/zh-cn/2018/11/16/（五）如何在Psychopy中新建窗口/index.html">
 <meta property="og:site_name" content="swolf的博客">
-<meta property="og:description" content="欢迎光临，这里是swolf的博客~">
+<meta property="og:description" content="新建单窗口窗口(windows)是刺激呈现的舞台，任何刺激对象都需要指定其所属的窗口对象。Pyschopy的Window对象位于psychopy.visual模块中，一个最简单的窗口示例如下from psychopy import visual, event, monitors, coreimport numpy as np# 根据你自己的显示器调整显示器信息mon = monitors.Mon">
 <meta property="og:locale" content="zh-cn">
+<meta property="og:updated_time" content="2018-11-20T03:00:29.368Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="swolf的博客">
-<meta name="twitter:description" content="欢迎光临，这里是swolf的博客~">
+<meta name="twitter:title" content="（五）如何在Psychopy中新建窗口">
+<meta name="twitter:description" content="新建单窗口窗口(windows)是刺激呈现的舞台，任何刺激对象都需要指定其所属的窗口对象。Pyschopy的Window对象位于psychopy.visual模块中，一个最简单的窗口示例如下from psychopy import visual, event, monitors, coreimport numpy as np# 根据你自己的显示器调整显示器信息mon = monitors.Mon">
     
     
         
@@ -66,7 +67,7 @@
         
     
 
-<header id="header" data-behavior="2">
+<header id="header" data-behavior="5">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
     <div class="header-title">
         <a class="header-title-link" href="/ ">swolf的博客</a>
@@ -89,7 +90,7 @@
         
     
 
-<nav id="sidebar" data-behavior="2">
+<nav id="sidebar" data-behavior="5">
     <div class="sidebar-container">
         
             <div class="sidebar-profile">
@@ -183,26 +184,22 @@
 </nav>
 
             
-            <div id="main" data-behavior="2"
+            <div id="main" data-behavior="5"
                  class="
                         hasCoverMetaIn
                         ">
                 
-    <section class="postShorten-group main-content-wrap">
+<article class="post">
     
     
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a class="link-unstyled" href="/zh-cn/2018/11/16/（五）如何在Psychopy中新建窗口/">
-                            （五）如何在Psychopy中新建窗口
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            （五）如何在Psychopy中新建窗口
+        </h1>
+    
+    
+        <div class="post-meta">
     <time datetime="2018-11-16T21:15:22+08:00">
 	
 		    11月 16, 2018
@@ -217,307 +214,91 @@
     
 </div>
 
-            </div>
-            
-                <div class="postShorten-content">
-                    <h1 id="table-of-contents">目录</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#新建单窗口"><span class="toc-text">新建单窗口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#新建多窗口"><span class="toc-text">新建多窗口</span></a></li></ol>
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <h1 id="table-of-contents">目录</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#新建单窗口"><span class="toc-text">新建单窗口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#新建多窗口"><span class="toc-text">新建多窗口</span></a></li></ol>
 <h2 id="新建单窗口"><a href="#新建单窗口" class="headerlink" title="新建单窗口"></a>新建单窗口</h2><p>窗口(windows)是刺激呈现的舞台，任何刺激对象都需要指定其所属的窗口对象。Pyschopy的Window对象位于psychopy.visual模块中，一个最简单的窗口示例如下<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> psychopy <span class="keyword">import</span> visual, event, monitors, core</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="comment"># 根据你自己的显示器调整显示器信息</span></span><br><span class="line">mon = monitors.Monitor(</span><br><span class="line">    name=<span class="string">'my_monitor'</span>,</span><br><span class="line">    width=<span class="number">53.704</span>,  <span class="comment"># 显示器宽度，单位cm</span></span><br><span class="line">    distance=<span class="number">45</span>,   <span class="comment"># 被试距显示器距离，单位cm</span></span><br><span class="line">    gamma=<span class="keyword">None</span>,    <span class="comment"># gamma值</span></span><br><span class="line">    verbose=<span class="keyword">False</span>) <span class="comment"># 是否输出详细信息</span></span><br><span class="line">mon.setSizePix((<span class="number">1920</span>, <span class="number">1080</span>)) <span class="comment"># 设置显示器分辨率</span></span><br><span class="line">mon.save() <span class="comment"># 保存显示器信息</span></span><br><span class="line"></span><br><span class="line">win = visual.Window(monitor=mon, size=(<span class="number">800</span>, <span class="number">600</span>), fullscr=<span class="keyword">False</span>,</span><br><span class="line">    screen=<span class="number">0</span>, winType=<span class="string">'pyglet'</span>, units=<span class="string">'norm'</span>, allowGUI=<span class="keyword">True</span>)</span><br><span class="line"></span><br><span class="line">event.waitKeys() <span class="comment"># 等待按键</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 修复或预防原始gamma不能恢复bug(运行Psychopy程序显示器变暗加入以下代码)</span></span><br><span class="line">origLUT = np.round(win.backend._origGammaRamp * <span class="number">65535.0</span>).astype(<span class="string">"uint16"</span>)</span><br><span class="line">origLUT = origLUT.byteswap() / <span class="number">255.0</span></span><br><span class="line">win.backend._origGammaRamp = origLUT</span><br><span class="line">core.quit() <span class="comment"># 退出Psychopy程序</span></span><br></pre></td></tr></table></figure></p>
 <p>Window对象用size参数申明窗口尺寸为800*600像素；fullscr参数决定是否全屏显示；screen参数决定了窗口在哪个显示器上显示，通常0是主显示器；winType参数决定了Psychopy使用的后端程序，有’pyglet’和’pygame’两种选择（Psychopy官方未来主要采用pyglet作为后端程序，我推荐采用pyglet）。</p>
 <h2 id="新建多窗口"><a href="#新建多窗口" class="headerlink" title="新建多窗口"></a>新建多窗口</h2><p>Psychopy也可以同时建立多个窗口对象，注意仅pyglet后端支持多窗口行为。下面的代码展示了如何新建两个位于不同位置的窗口<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> psychopy <span class="keyword">import</span> visual, event, monitors, core</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="comment"># 根据你自己的显示器调整显示器信息</span></span><br><span class="line">mon = monitors.Monitor(</span><br><span class="line">    name=<span class="string">'my_monitor'</span>,</span><br><span class="line">    width=<span class="number">53.704</span>,  <span class="comment"># 显示器宽度，单位cm</span></span><br><span class="line">    distance=<span class="number">45</span>,   <span class="comment"># 被试距显示器距离，单位cm</span></span><br><span class="line">    gamma=<span class="keyword">None</span>,    <span class="comment"># gamma值</span></span><br><span class="line">    verbose=<span class="keyword">False</span>) <span class="comment"># 是否输出详细信息</span></span><br><span class="line">mon.setSizePix((<span class="number">1920</span>, <span class="number">1080</span>)) <span class="comment"># 设置显示器分辨率</span></span><br><span class="line">mon.save() <span class="comment"># 保存显示器信息</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 窗口1在屏幕左上角</span></span><br><span class="line">win1 = visual.Window(monitor=mon, size=(<span class="number">800</span>, <span class="number">600</span>), pos=(<span class="number">0</span>, <span class="number">0</span>), fullscr=<span class="keyword">False</span>,</span><br><span class="line">    screen=<span class="number">0</span>, winType=<span class="string">'pyglet'</span>, units=<span class="string">'norm'</span>, allowGUI=<span class="keyword">True</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 窗口2在屏幕右下角</span></span><br><span class="line">win2 = visual.Window(monitor=mon, size=(<span class="number">800</span>, <span class="number">600</span>), pos=(<span class="number">1120</span>, <span class="number">480</span>), fullscr=<span class="keyword">False</span>,</span><br><span class="line">    screen=<span class="number">0</span>, winType=<span class="string">'pyglet'</span>, units=<span class="string">'norm'</span>, allowGUI=<span class="keyword">True</span>)</span><br><span class="line"></span><br><span class="line">event.waitKeys() <span class="comment"># 等待按键</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 修复或预防原始gamma不能恢复bug(运行Psychopy程序显示器变暗加入以下代码)</span></span><br><span class="line">origLUT = np.round(win1.backend._origGammaRamp * <span class="number">65535.0</span>).astype(<span class="string">"uint16"</span>)</span><br><span class="line">origLUT = origLUT.byteswap() / <span class="number">255.0</span></span><br><span class="line">win1.backend._origGammaRamp = origLUT</span><br><span class="line">win2.backend._origGammaRamp = origLUT</span><br><span class="line">core.quit() <span class="comment"># 退出Psychopy程序</span></span><br></pre></td></tr></table></figure></p>
 <p>pos参数调整窗口在屏幕上显示的位置，单位始终为像素，这里的坐标系不同于Psychopy的坐标系，以屏幕的左上角为原点，向下和向右分别为y轴和x轴的正方向。Window对象有很多可调整的参数和行为，具体细节可见<a href="http://www.psychopy.org/api/visual/window.html#psychopy.visual.Window" target="_blank" rel="noopener">官方文档Window API</a></p>
 
-                    
-                        
-
-                    
-                    
-                        <p>
-                            <a href="/zh-cn/2018/11/16/（五）如何在Psychopy中新建窗口/#post-footer" class="postShorten-excerpt_link link">
-                                评论和共享
-                            </a>
-                        </p>
-                    
-                </div>
             
+
         </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
         
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a class="link-unstyled" href="/zh-cn/2018/11/16/（四）如何在Psychopy中实现高时间精度的刺激呈现/">
-                            （四）如何在Psychopy中实现高时间精度的刺激呈现
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2018-11-16T20:35:15+08:00">
-	
-		    11月 16, 2018
-    	
-    </time>
-    
-        <span>发布在 </span>
-        
-    <a class="category-link" href="/categories/psychopy系列/">psychopy系列</a>
-
-
-    
-</div>
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">标签</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/psychopy/">psychopy</a>
 
             </div>
-            
-                <div class="postShorten-content">
-                    <h1 id="table-of-contents">目录</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Timing-matters"><span class="toc-text">Timing matters!!</span></a></li></ol>
-<h2 id="Timing-matters"><a href="#Timing-matters" class="headerlink" title="Timing matters!!"></a>Timing matters!!</h2>
-                    
-                        
-
-                    
-                    
-                        <p>
-                            <a href="/zh-cn/2018/11/16/（四）如何在Psychopy中实现高时间精度的刺激呈现/#post-footer" class="postShorten-excerpt_link link">
-                                评论和共享
-                            </a>
-                        </p>
-                    
-                </div>
-            
-        </div>
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a class="link-unstyled" href="/zh-cn/2018/11/15/（三）Psychopy色彩系统和gamma校正/">
-                            （三）Psychopy色彩系统和gamma校正
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2018-11-15T14:33:51+08:00">
-	
-		    11月 15, 2018
-    	
-    </time>
-    
-        <span>发布在 </span>
-        
-    <a class="category-link" href="/categories/psychopy系列/">psychopy系列</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-excerpt">
-                    <!-- toc -->
-<h2 id="Psychopy色彩系统"><a href="#Psychopy色彩系统" class="headerlink" title="Psychopy色彩系统"></a>Psychopy色彩系统</h2><p>Psychopy提供多种方式申明颜色信息。作为一个缺乏艺术细菌的人，我发现通过RGB、HSV等色彩空间来申明颜色的方式不太容易理解，因此我会在本文加入一些色彩理论的部分，希望能给像我一样对色彩一头雾水的小伙伴一些启示。<br>
-                    
-                        <a href="/zh-cn/2018/11/15/（三）Psychopy色彩系统和gamma校正/" class="postShorten-excerpt_link link">
-                            阅读全文
-                        </a>
-                        
-                    
-                </p></div>
-            
-        </div>
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a class="link-unstyled" href="/zh-cn/2018/11/13/简明滤波纲要/">
-                            简明滤波纲要
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2018-11-13T11:02:00+08:00">
-	
-		    11月 13, 2018
-    	
-    </time>
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-content">
-                    
-                    
-                        
-
-                    
-                    
-                        <p>
-                            <a href="/zh-cn/2018/11/13/简明滤波纲要/#post-footer" class="postShorten-excerpt_link link">
-                                评论和共享
-                            </a>
-                        </p>
-                    
-                </div>
-            
-        </div>
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a class="link-unstyled" href="/zh-cn/2018/11/11/（二）Psychopy坐标系统与显示器设置/">
-                            （二）Psychopy坐标系统与显示器设置
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2018-11-11T21:20:16+08:00">
-	
-		    11月 11, 2018
-    	
-    </time>
-    
-        <span>发布在 </span>
-        
-    <a class="category-link" href="/categories/psychopy系列/">psychopy系列</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-excerpt">
-                    <!-- toc -->
-<h2 id="Psychopy的坐标系统"><a href="#Psychopy的坐标系统" class="headerlink" title="Psychopy的坐标系统"></a>Psychopy的坐标系统</h2><p>Psychopy提供了5种不同的坐标单位(unit)，使用者只需提供刺激对应的坐标单位，Psychopy会自动计算刺激所对应的像素点范围。这种多坐标单位的好处在于，能够开发和设备无关的刺激呈现，不需要每次实验都对刺激的大小和呈现位置进行调整。其劣势则是需要精心挑选刺激对应的坐标单位，有时还要在不同单位间进行转换，一不小心就容易出错。<br>
-                    
-                        <a href="/zh-cn/2018/11/11/（二）Psychopy坐标系统与显示器设置/" class="postShorten-excerpt_link link">
-                            阅读全文
-                        </a>
-                        
-                    
-                </p></div>
-            
-        </div>
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a class="link-unstyled" href="/zh-cn/2018/11/10/（一）Psychopy安装和使用/">
-                            （一）Psychopy安装和使用
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2018-11-10T20:59:35+08:00">
-	
-		    11月 10, 2018
-    	
-    </time>
-    
-        <span>发布在 </span>
-        
-    <a class="category-link" href="/categories/psychopy系列/">psychopy系列</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-excerpt">
-                    <!-- toc -->
-<h2 id="什么是Psychopy"><a href="#什么是Psychopy" class="headerlink" title="什么是Psychopy"></a>什么是Psychopy</h2><p>Psychopy是基于Python的心理学实验设计软件，由英国诺丁汉大学的Jon Peirce主持开发。Psychopy结合了OpenGL的图形优势和Python的语法特性，给科学家们提供了快速构建高性能的图形刺激界面的工具。<br>
-                    
-                        <a href="/zh-cn/2018/11/10/（一）Psychopy安装和使用/" class="postShorten-excerpt_link link">
-                            阅读全文
-                        </a>
-                        
-                    
-                </p></div>
-            
-        </div>
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a class="link-unstyled" href="/zh-cn/2018/11/09/博客测试/">
-                            博客测试
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2018-11-09T21:03:15+08:00">
-	
-		    11月 09, 2018
-    	
-    </time>
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-content">
-                    <p>本博客记录我在学习过程中的心得</p>
-
-                    
-                        
-
-                    
-                    
-                        <p>
-                            <a href="/zh-cn/2018/11/09/博客测试/#post-footer" class="postShorten-excerpt_link link">
-                                评论和共享
-                            </a>
-                        </p>
-                    
-                </div>
-            
-        </div>
-        
-    </article>
-    
-    <div class="pagination-bar">
-    <ul class="pagination">
         
         
-        <li class="pagination-number">第 1 页 共 1 页</li>
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/zh-cn/2018/11/16/（四）如何在Psychopy中实现高时间精度的刺激呈现/" data-tooltip="（四）如何在Psychopy中实现高时间精度的刺激呈现" aria-label="下一篇: （四）如何在Psychopy中实现高时间精度的刺激呈现">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="目录">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
     </ul>
 </div>
 
-</section>
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
 
 
 
@@ -528,6 +309,65 @@
 </footer>
 
             </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="5">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/zh-cn/2018/11/16/（四）如何在Psychopy中实现高时间精度的刺激呈现/" data-tooltip="（四）如何在Psychopy中实现高时间精度的刺激呈现" aria-label="下一篇: （四）如何在Psychopy中实现高时间精度的刺激呈现">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="目录">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                <div id="share-options-bar" class="share-options-bar" data-behavior="5">
+    <i id="btn-close-shareoptions" class="fa fa-times"></i>
+    <ul class="share-options">
+        
+    </ul>
+</div>
+
             
         </div>
         
@@ -568,6 +408,25 @@
         <!--SCRIPTS-->
 <script src="/assets/js/script-vufjrm3fmbuttogo1hxuu0w9w0sesk5iyysjuguc2hdhufot9szxg8twijry.min.js"></script>
 <!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://mrswolf.github.io/zh-cn/2018/11/16/（五）如何在Psychopy中新建窗口/';
+                 
+                    this.page.identifier = 'zh-cn/2018/11/16/（五）如何在Psychopy中新建窗口/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'mrswolf-github-io';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
 
 
 

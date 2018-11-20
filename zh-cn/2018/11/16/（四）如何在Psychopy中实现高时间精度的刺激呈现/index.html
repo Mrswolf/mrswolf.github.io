@@ -6,28 +6,28 @@
     <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="swolf的博客">
-    <title>博客测试 - swolf的博客</title>
+    <title>（四）如何在Psychopy中实现高时间精度的刺激呈现 - swolf的博客</title>
     <meta name="author" content="swolf">
     
-        <meta name="keywords" content="脑机接口,神经科学,机器学习,swolf,计算机,脑科学,Python,深度学习,">
+        <meta name="keywords" content="脑机接口,神经科学,机器学习,swolf,计算机,脑科学,Python,深度学习,psychopy,刺激时间,G-Sync">
     
     
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"swolf","sameAs":["/about","https://github.com/Mrswolf"],"image":"avatar0.jpg"},"articleBody":"本博客记录我在学习过程中的心得\n","dateCreated":"2018-11-09T21:03:15+08:00","dateModified":"2018-11-09T21:05:59+08:00","datePublished":"2018-11-09T21:03:15+08:00","description":"","headline":"博客测试","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mrswolf.github.io/zh-cn/2018/11/09/博客测试/"},"publisher":{"@type":"Organization","name":"swolf","sameAs":["/about","https://github.com/Mrswolf"],"image":"avatar0.jpg","logo":{"@type":"ImageObject","url":"avatar0.jpg"}},"url":"https://mrswolf.github.io/zh-cn/2018/11/09/博客测试/"}</script>
-    <meta name="description" content="本博客记录我在学习过程中的心得">
-<meta name="keywords" content="脑机接口,神经科学,机器学习,swolf,计算机,脑科学,Python,深度学习">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"swolf","sameAs":["/about","https://github.com/Mrswolf"],"image":"avatar0.jpg"},"articleBody":"\nTiming matters!!","dateCreated":"2018-11-16T20:35:15+08:00","dateModified":"2018-11-16T21:25:20+08:00","datePublished":"2018-11-16T20:35:15+08:00","description":"","headline":"（四）如何在Psychopy中实现高时间精度的刺激呈现","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mrswolf.github.io/zh-cn/2018/11/16/（四）如何在Psychopy中实现高时间精度的刺激呈现/"},"publisher":{"@type":"Organization","name":"swolf","sameAs":["/about","https://github.com/Mrswolf"],"image":"avatar0.jpg","logo":{"@type":"ImageObject","url":"avatar0.jpg"}},"url":"https://mrswolf.github.io/zh-cn/2018/11/16/（四）如何在Psychopy中实现高时间精度的刺激呈现/","keywords":"psychopy"}</script>
+    <meta name="description" content="Timing matters!!">
+<meta name="keywords" content="psychopy,刺激时间,G-Sync">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="博客测试">
-<meta property="og:url" content="https://mrswolf.github.io/zh-cn/2018/11/09/博客测试/index.html">
+<meta property="og:title" content="（四）如何在Psychopy中实现高时间精度的刺激呈现">
+<meta property="og:url" content="https://mrswolf.github.io/zh-cn/2018/11/16/（四）如何在Psychopy中实现高时间精度的刺激呈现/index.html">
 <meta property="og:site_name" content="swolf的博客">
-<meta property="og:description" content="本博客记录我在学习过程中的心得">
+<meta property="og:description" content="Timing matters!!">
 <meta property="og:locale" content="zh-cn">
-<meta property="og:updated_time" content="2018-11-09T13:05:59.344Z">
+<meta property="og:updated_time" content="2018-11-16T13:25:20.300Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="博客测试">
-<meta name="twitter:description" content="本博客记录我在学习过程中的心得">
+<meta name="twitter:title" content="（四）如何在Psychopy中实现高时间精度的刺激呈现">
+<meta name="twitter:description" content="Timing matters!!">
     
     
         
@@ -195,16 +195,22 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            博客测试
+            （四）如何在Psychopy中实现高时间精度的刺激呈现
         </h1>
     
     
         <div class="post-meta">
-    <time datetime="2018-11-09T21:03:15+08:00">
+    <time datetime="2018-11-16T20:35:15+08:00">
 	
-		    11月 09, 2018
+		    11月 16, 2018
     	
     </time>
+    
+        <span>发布在 </span>
+        
+    <a class="category-link" href="/categories/psychopy系列/">psychopy系列</a>
+
+
     
 </div>
 
@@ -214,13 +220,20 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p>本博客记录我在学习过程中的心得</p>
-
+            <h1 id="table-of-contents">目录</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Timing-matters"><span class="toc-text">Timing matters!!</span></a></li></ol>
+<h2 id="Timing-matters"><a href="#Timing-matters" class="headerlink" title="Timing matters!!"></a>Timing matters!!</h2>
             
 
         </div>
     </div>
     <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">标签</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/psychopy/">psychopy</a>
+
+            </div>
         
         
             <div class="post-actions-wrap">
@@ -229,7 +242,7 @@
             <li class="post-action">
                 
                     
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/zh-cn/2018/11/10/（一）Psychopy安装和使用/" data-tooltip="（一）Psychopy安装和使用" aria-label="上一篇: （一）Psychopy安装和使用">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/zh-cn/2018/11/16/（五）如何在Psychopy中新建窗口/" data-tooltip="（五）如何在Psychopy中新建窗口" aria-label="上一篇: （五）如何在Psychopy中新建窗口">
                 
                     <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
@@ -237,7 +250,8 @@
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--disabled">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/zh-cn/2018/11/15/（三）Psychopy色彩系统和gamma校正/" data-tooltip="（三）Psychopy色彩系统和gamma校正" aria-label="下一篇: （三）Psychopy色彩系统和gamma校正">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
@@ -263,7 +277,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="目录">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -300,7 +314,7 @@
             <li class="post-action">
                 
                     
-                    <a class="post-action-btn btn btn--default tooltip--top" href="/zh-cn/2018/11/10/（一）Psychopy安装和使用/" data-tooltip="（一）Psychopy安装和使用" aria-label="上一篇: （一）Psychopy安装和使用">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/zh-cn/2018/11/16/（五）如何在Psychopy中新建窗口/" data-tooltip="（五）如何在Psychopy中新建窗口" aria-label="上一篇: （五）如何在Psychopy中新建窗口">
                 
                     <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
@@ -308,7 +322,8 @@
             </li>
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--disabled">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/zh-cn/2018/11/15/（三）Psychopy色彩系统和gamma校正/" data-tooltip="（三）Psychopy色彩系统和gamma校正" aria-label="下一篇: （三）Psychopy色彩系统和gamma校正">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
@@ -334,7 +349,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="目录">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -395,9 +410,9 @@
     
         <script>
              var disqus_config = function () {
-                 this.page.url = 'https://mrswolf.github.io/zh-cn/2018/11/09/博客测试/';
+                 this.page.url = 'https://mrswolf.github.io/zh-cn/2018/11/16/（四）如何在Psychopy中实现高时间精度的刺激呈现/';
                  
-                    this.page.identifier = 'zh-cn/2018/11/09/博客测试/';
+                    this.page.identifier = 'zh-cn/2018/11/16/（四）如何在Psychopy中实现高时间精度的刺激呈现/';
                  
              };
             (function() {
