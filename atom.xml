@@ -39,69 +39,6 @@
   </entry>
   
   <entry>
-    <title>（四）如何在Psychopy中实现高时间精度的刺激呈现</title>
-    <link href="https://mrswolf.github.io/zh-cn/2018/11/16/%EF%BC%88%E5%9B%9B%EF%BC%89%E5%A6%82%E4%BD%95%E5%9C%A8Psychopy%E4%B8%AD%E5%AE%9E%E7%8E%B0%E9%AB%98%E6%97%B6%E9%97%B4%E7%B2%BE%E5%BA%A6%E7%9A%84%E5%88%BA%E6%BF%80%E5%91%88%E7%8E%B0/"/>
-    <id>https://mrswolf.github.io/zh-cn/2018/11/16/（四）如何在Psychopy中实现高时间精度的刺激呈现/</id>
-    <published>2018-11-16T12:35:15.961Z</published>
-    <updated>2018-11-16T13:25:20.300Z</updated>
-    
-    <content type="html"><![CDATA[<!-- toc --><h2 id="Timing-matters"><a href="#Timing-matters" class="headerlink" title="Timing matters!!"></a>Timing matters!!</h2>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;!-- toc --&gt;
-&lt;h2 id=&quot;Timing-matters&quot;&gt;&lt;a href=&quot;#Timing-matters&quot; class=&quot;headerlink&quot; title=&quot;Timing matters!!&quot;&gt;&lt;/a&gt;Timing matters!!&lt;/h2&gt;
-      
-    
-    </summary>
-    
-      <category term="psychopy系列" scheme="https://mrswolf.github.io/categories/psychopy%E7%B3%BB%E5%88%97/"/>
-    
-    
-      <category term="psychopy" scheme="https://mrswolf.github.io/tags/psychopy/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>（三）Psychopy色彩系统和gamma校正</title>
-    <link href="https://mrswolf.github.io/zh-cn/2018/11/15/%EF%BC%88%E4%B8%89%EF%BC%89Psychopy%E8%89%B2%E5%BD%A9%E7%B3%BB%E7%BB%9F%E5%92%8Cgamma%E6%A0%A1%E6%AD%A3/"/>
-    <id>https://mrswolf.github.io/zh-cn/2018/11/15/（三）Psychopy色彩系统和gamma校正/</id>
-    <published>2018-11-15T06:33:51.654Z</published>
-    <updated>2018-11-16T13:59:10.170Z</updated>
-    
-    <content type="html"><![CDATA[<!-- toc --><h2 id="Psychopy色彩系统"><a href="#Psychopy色彩系统" class="headerlink" title="Psychopy色彩系统"></a>Psychopy色彩系统</h2><p>Psychopy提供多种方式申明颜色信息。作为一个缺乏艺术细菌的人，我发现通过RGB、HSV等色彩空间来申明颜色的方式不太容易理解，因此我会在本文加入一些色彩理论的部分，希望能给像我一样对色彩一头雾水的小伙伴一些启示。<br><a id="more"></a></p><h3 id="按名称或16进制值编码声明"><a href="#按名称或16进制值编码声明" class="headerlink" title="按名称或16进制值编码声明"></a>按名称或16进制值编码声明</h3><p>Psychopy可直接使用颜色名称来申明颜色，也可按照颜色所对应的16进制编码来申明颜色。Psychopy支持主流浏览器所支持的<a href="https://www.w3schools.com/Colors/colors_names.asp" target="_blank" rel="noopener">颜色种类</a>。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> psychopy <span class="keyword">import</span> visual, event</span><br><span class="line">win = visual.Window(size=(<span class="number">800</span>, <span class="number">600</span>), color=(<span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>), </span><br><span class="line">    screen=<span class="number">0</span>, winType=<span class="string">'pyglet'</span>, units=<span class="string">'norm'</span>)</span><br><span class="line">rect = visual.Rect(win, width=<span class="number">1</span>, height=<span class="number">1</span>)</span><br><span class="line">rect.setFillColor(<span class="string">'Blue'</span>) <span class="comment"># 颜色名</span></span><br><span class="line">rect.setFillColor(<span class="string">'#0000FF'</span>) <span class="comment"># 16进制</span></span><br><span class="line">rect.draw()</span><br><span class="line">win.flip()</span><br><span class="line">event.waitKeys() <span class="comment"># 等待按键</span></span><br></pre></td></tr></table></figure><br><blockquote><p><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">stim = visual.GratingStim(win, color=[<span class="number">1</span>,<span class="number">-1</span>,<span class="number">-1</span>], colorSpace=<span class="string">'rgb'</span>) <span class="comment"># will be red</span></span><br><span class="line">stim.setColor(<span class="string">'Firebrick'</span>) <span class="comment"># one of the web/X11 color names</span></span><br><span class="line">stim.setColor(<span class="string">'#FFFAF0'</span>) <span class="comment"># an off-white</span></span><br></pre></td></tr></table></figure><br>官方文档演示采用setColor方法来设置颜色，该方法对GratingStim类有效。尽管官方文档中指出ShapeStim类（Rect、Circle、Polygon、Line皆为其子类）也包含setColor方法，但源码表明其并不支持，需要用setFillColor和setLineColor方法代替。</p></blockquote></p><h3 id="RGB空间"><a href="#RGB空间" class="headerlink" title="RGB空间"></a>RGB空间</h3><p>RGB颜色模型是使用最为广泛的一种模型，<br>RGB每一通道在Psychopy中的取值为-1:1，而不是大多数应用中的0:1或0:255。Psychopy采用这样的取值范围主要是为了符合大多数心理学实验中以灰色作为基础背景色的习惯，即以(0, 0, 0)代表中性灰色。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> psychopy <span class="keyword">import</span> visual, event</span><br><span class="line">win = visual.Window(size=(<span class="number">800</span>, <span class="number">600</span>), color=(<span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>), </span><br><span class="line">    screen=<span class="number">0</span>, winType=<span class="string">'pyglet'</span>, units=<span class="string">'norm'</span>)</span><br><span class="line">rect = visual.Rect(win, width=<span class="number">1</span>, height=<span class="number">1</span>)</span><br><span class="line">rect.setFillColor((<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), colorSpace=<span class="string">'rgb'</span>) <span class="comment"># grey</span></span><br><span class="line">rect.setFillColor((<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>), colorSpace=<span class="string">'rgb'</span>) <span class="comment"># white</span></span><br><span class="line">rect.draw()</span><br><span class="line">win.flip()</span><br><span class="line">event.waitKeys() <span class="comment"># 等待按键</span></span><br></pre></td></tr></table></figure></p><h3 id="HSV空间"><a href="#HSV空间" class="headerlink" title="HSV空间"></a>HSV空间</h3><p>色相(hue)在Psychopy中可以是任意角度（0度，90度，-90度，512度），饱和度(saturation)的取值范围为0:1，明度(value)的取值范围为0:1。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> psychopy <span class="keyword">import</span> visual, event</span><br><span class="line">win = visual.Window(size=(<span class="number">800</span>, <span class="number">600</span>), color=(<span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>), </span><br><span class="line">    screen=<span class="number">0</span>, winType=<span class="string">'pyglet'</span>, units=<span class="string">'norm'</span>)</span><br><span class="line">rect = visual.Rect(win, width=<span class="number">1</span>, height=<span class="number">1</span>)</span><br><span class="line">rect.setFillColor((<span class="number">0</span>, <span class="number">0</span>, <span class="number">0.5</span>), colorSpace=<span class="string">'hsv'</span>) <span class="comment"># grey</span></span><br><span class="line">rect.setFillColor((<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>), colorSpace=<span class="string">'hsv'</span>)   <span class="comment"># white</span></span><br><span class="line">rect.setLineColor((<span class="number">90</span>, <span class="number">1</span>, <span class="number">1</span>), colorSpace=<span class="string">'hsv'</span>)  <span class="comment"># cyan</span></span><br><span class="line">rect.draw()</span><br><span class="line">win.flip()</span><br><span class="line">event.waitKeys() <span class="comment"># 等待按键</span></span><br></pre></td></tr></table></figure></p><h3 id="DKL空间"><a href="#DKL空间" class="headerlink" title="DKL空间"></a>DKL空间</h3><h3 id="LMS空间"><a href="#LMS空间" class="headerlink" title="LMS空间"></a>LMS空间</h3><h2 id="gamma校正"><a href="#gamma校正" class="headerlink" title="gamma校正"></a>gamma校正</h2><h2 id="如何根据颜色显示需求选择显示器"><a href="#如何根据颜色显示需求选择显示器" class="headerlink" title="如何根据颜色显示需求选择显示器"></a>如何根据颜色显示需求选择显示器</h2>]]></content>
-    
-    <summary type="html">
-    
-      &lt;!-- toc --&gt;
-&lt;h2 id=&quot;Psychopy色彩系统&quot;&gt;&lt;a href=&quot;#Psychopy色彩系统&quot; class=&quot;headerlink&quot; title=&quot;Psychopy色彩系统&quot;&gt;&lt;/a&gt;Psychopy色彩系统&lt;/h2&gt;&lt;p&gt;Psychopy提供多种方式申明颜色信息。作为一个缺乏艺术细菌的人，我发现通过RGB、HSV等色彩空间来申明颜色的方式不太容易理解，因此我会在本文加入一些色彩理论的部分，希望能给像我一样对色彩一头雾水的小伙伴一些启示。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="psychopy系列" scheme="https://mrswolf.github.io/categories/psychopy%E7%B3%BB%E5%88%97/"/>
-    
-    
-      <category term="psychopy" scheme="https://mrswolf.github.io/tags/psychopy/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>简明滤波纲要</title>
-    <link href="https://mrswolf.github.io/zh-cn/2018/11/13/%E7%AE%80%E6%98%8E%E6%BB%A4%E6%B3%A2%E7%BA%B2%E8%A6%81/"/>
-    <id>https://mrswolf.github.io/zh-cn/2018/11/13/简明滤波纲要/</id>
-    <published>2018-11-13T03:02:00.519Z</published>
-    <updated>2018-11-13T03:02:00.523Z</updated>
-    
-    <summary type="html">
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
     <title>（二）Psychopy坐标系统与显示器设置</title>
     <link href="https://mrswolf.github.io/zh-cn/2018/11/11/%EF%BC%88%E4%BA%8C%EF%BC%89Psychopy%E5%9D%90%E6%A0%87%E7%B3%BB%E7%BB%9F%E4%B8%8E%E6%98%BE%E7%A4%BA%E5%99%A8%E8%AE%BE%E7%BD%AE/"/>
     <id>https://mrswolf.github.io/zh-cn/2018/11/11/（二）Psychopy坐标系统与显示器设置/</id>
