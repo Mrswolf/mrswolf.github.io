@@ -1,0 +1,629 @@
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+    
+<head>
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="swolf的博客">
+    <title>（六）Psychopy事件响应 - swolf的博客</title>
+    <meta name="author" content="swolf">
+    
+        <meta name="keywords" content="脑机接口,神经科学,机器学习,swolf,计算机,脑科学,Python,深度学习,psychopy,事件响应">
+    
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"swolf","sameAs":["/about","https://github.com/Mrswolf"],"image":"avatar0.jpg"},"articleBody":"\nPsychopy事件响应Psychopy提供了很多IO交互方式，当然，最根本的还是键盘和鼠标。本节介绍Psychopy鼠标和键盘的编程技巧。\n全局按键响应编写刺激界面免不了要反复调试，要看看字体颜色对不对、图形大小合不合适，一旦发现刺激界面需要改进就得退出程序修改源代码。\n如果采用普通的按键检测方式，则需要在一个循环体内检查按键状态，这显然有可能造成不可知的错误（比如在检测按键前进入一个死循环函数，程序永远无法退出啦），这个时候全局按键响应就很有用了。\nPsychopy用psychopy.event.globalkeys来设置全局按键，官方文档里没有如何使用全局按键的说明，但在coder的Demo里有演示global_event_keys.py。\nglobal_event.keys.py程序注册了三个按键，按键“b”调用python的setattr函数，设置rect对象的填充颜色为蓝色,按键“ctrl”+“r”调用python的setattr函数，设置rect对象的填充颜色为红色。按键“q”调用core.quit方法终止程序退出。# -*- coding: utf-8 -*-from psychopy import core, event, visual, monitorsif __name__=='__main__':    mon = monitors.Monitor(        name='my_monitor',        width=53.704,  # 显示器宽度，单位cm        distance=45,   # 被试距显示器距离，单位cm        gamma=None,    # gamma值        verbose=False) # 是否输出详细信息    mon.setSizePix((1920, 1080)) # 设置显示器分辨率    mon.save() # 保存显示器信息    win = visual.Window(monitor=mon, size=(800, 600), fullscr=False,        screen=0, winType='pyglet', units='norm', allowGUI=False)    rect = visual.Rect(win, fillColor='blue', pos=(0, -0.2))    text = visual.TextStim(        win,        pos=(0, 0.5),        text=('Press\\n\\n'              'B for blue rectangle,\\n'              'CTRL + R for red rectangle,\\n'              'Q or ESC to quit.'))    # Add an event key.    event.globalKeys.add(key='b', func=setattr,                         func_args=(rect, 'fillColor', 'blue'),                         name='blue rect')    # Add an event key with a \"modifier\" (CTRL).    event.globalKeys.add(key='r', modifiers=['ctrl'], func=setattr,                         func_args=(rect, 'fillColor', 'red'),                         name='red rect')    # Add multiple shutdown keys \"at once\".    for key in ['q', 'escape']:        event.globalKeys.add(key, func=core.quit)    # Print all currently defined global event keys.    print(event.globalKeys)    print(repr(event.globalKeys))    while True:        text.draw()        rect.draw()        win.flip()\n以下是event.globalkeys.add()方法的参数介绍event.globalkeys.add(key, func, func_args=(), func_kwargs=None, modifiers=(), name=None)\n\n\n\n\nparameters\ntype\ndescription\n\n\n\n\nkey\nstring\n按键字符串\n\n\nfunc\nfunction\n按键时执行的函数\n\n\nfunc_args\niterable\n函数的args参数\n\n\nfunc_kwargs\ndict\n函数的kwargs参数\n\n\nmodifiers\niterable\n组合按键字符串列表，例如’shift’,’ctrl’,’alt’,’capslock’,’scrollock’等\n\n\nname\nstring\n按键事件的名称\n\n\n\n\n此外还有event.globalkeys.remove()方法以移除全局按键event.globalkeys.remove(key, modifiers=())\n\n\n\n\nparameters\ntype\ndescription\n\n\n\n\nkey\nstring\n按键字符串\n\n\nmodifiers\niterable\n组合按键字符串列表，例如’shift’,’ctrl’,’alt’,’capslock’,’scrollock’等\n\n\n\n\n等待按键和检测按键除了全局按键响应，Psychopy还提供了等待按键响应和检测按键响应两种方式。\n以下为等待按键函数event.waitKeys()的演示程序，按’esc’或五次其他按键退出程序。# -*- coding: utf-8 -*-from psychopy import core, event, visual, monitorsif __name__=='__main__':    mon = monitors.Monitor(        name='my_monitor',        width=53.704,  # 显示器宽度，单位cm        distance=45,   # 被试距显示器距离，单位cm        gamma=None,    # gamma值        verbose=False) # 是否输出详细信息    mon.setSizePix((1920, 1080)) # 设置显示器分辨率    mon.save() # 保存显示器信息    win = visual.Window(monitor=mon, size=(800, 600), fullscr=False,        screen=0, winType='pyglet', units='norm', allowGUI=False)    msg = visual.TextStim(win, text='press a key\\n &lt; esc &gt; to quit')    msg.draw()    win.flip()    k = ['']    count = 0    while k[0] not in ['escape', 'esc'] and count &lt; 5:        k = event.waitKeys()        print(k)        count += 1    win.close()    core.quit()\nevent.waitKeys()阻塞函数进程直到被试按键，以下是event.waitKeys()方法的参数介绍event.waitKeys(maxWait=inf, keyList=None, modifiers=False, timeStamped=False, clearEvents=True)\n\n\n\n\nparameters\ntype\ndescription\n\n\n\n\nmaxWait\nnumeric value\n最大等待时间，默认为inf\n\n\nkeyList\niterable\n指定函数检测的按键名称，函数仅在按指定键时返回\n\n\nmodifiers\nbool\n如果True，返回(keyname, modifiers)的tuple\n\n\ntimeStamped\nbool\n如果True，返回(keyname, time)\n\n\nclearEvents\nbool\n如果True，在检测新的按键前清理event buffer\n\n\n\n\n\n\n\n\nreturn\ntype\ndescription\n\n\n\n\nkeys\niterable\n按键列表；超时返回None\n\n\n\n\n等待按键会阻塞进程，Psychopy还提供了另一种非阻塞检测方式event.getKeys()。\n以下代码如下不断检测按键并输出，直到按’escape’键退出程序。# -*- coding: utf-8 -*-from psychopy import core, event, visual, monitorsif __name__=='__main__':    mon = monitors.Monitor(        name='my_monitor',        width=53.704,  # 显示器宽度，单位cm        distance=45,   # 被试距显示器距离，单位cm        gamma=None,    # gamma值        verbose=False) # 是否输出详细信息    mon.setSizePix((1920, 1080)) # 设置显示器分辨率    mon.save() # 保存显示器信息    win = visual.Window(monitor=mon, size=(800, 600), fullscr=False,        screen=0, winType='pyglet', units='norm', allowGUI=False)    msg = visual.TextStim(win, text='press a key\\n &lt; esc &gt; to quit')    msg.draw()    win.flip()    count = 0    while True:        k = event.getKeys()        if k:            if 'escape' in k:                break            print(k)    win.close()    core.quit()\n以下是event.getKeys()方法的参数介绍event.getKeys(keyList=None, modifiers=False, timeStamped=False)\n\n\n\n\nparameters\ntype\ndescription\n\n\n\n\nkeyList\niterable\n指定函数检测的按键名称，函数仅在按指定键时返回\n\n\nmodifiers\nbool\n如果True，返回(keyname, modifiers)的tuple\n\n\ntimeStamped\nbool\n如果True，返回(keyname, time)\n\n\n\n\n\n\n\n\nreturn\ntype\ndescription\n\n\n\n\nkeys\niterable\n按键列表；超时返回None\n\n\n\n\n鼠标事件Psychopy提供event.Mouse类来处理鼠标相关的事件，官方文档对此有详细的介绍。以下的代码显示了一个含有矩形的窗，在矩形内部单击左右键可以改变颜色，而按中央滚轮键则退出程序。\n# -*- coding: utf-8 -*-from psychopy import core, event, visual, monitorsif __name__=='__main__':    mon = monitors.Monitor(        name='my_monitor',        width=53.704,  # 显示器宽度，单位cm        distance=45,   # 被试距显示器距离，单位cm        gamma=None,    # gamma值        verbose=False) # 是否输出详细信息    mon.setSizePix((1920, 1080)) # 设置显示器分辨率    mon.save() # 保存显示器信息    win = visual.Window(monitor=mon, size=(800, 600), fullscr=False,        screen=0, winType='pyglet', units='norm', allowGUI=True)    rect = visual.Rect(win, fillColor='blue', pos=(0, 0))        # 创建Mouse类    mouse = event.Mouse(visible=True, newPos=(0, 0), win=win)    while True:        # 重置单击事件状态        mouse.clickReset()        # 检测左键是否在矩形内单击        if mouse.isPressedIn(rect, buttons=[0]):            rect.fillColor = 'red'        # 检测右键是否在矩形内单击        if mouse.isPressedIn(rect, buttons=[2]):            rect.fillColor = 'blue'                # 检测是否单击滚轮键        # button1: left click        # button2: middle click        # button3: right click        button1, button2, button3 = mouse.getPressed(getTime=False)        if button2:            break                rect.draw()        win.flip()    core.quit()\n","dateCreated":"2019-01-08T17:01:30+08:00","dateModified":"2019-01-08T17:01:30+08:00","datePublished":"2019-01-08T17:01:30+08:00","description":"\nPsychopy事件响应Psychopy提供了很多IO交互方式，当然，最根本的还是键盘和鼠标。本节介绍Psychopy鼠标和键盘的编程技巧。","headline":"（六）Psychopy事件响应","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mrswolf.github.io/zh-cn/2019/01/08/（六）Psychopy事件响应/"},"publisher":{"@type":"Organization","name":"swolf","sameAs":["/about","https://github.com/Mrswolf"],"image":"avatar0.jpg","logo":{"@type":"ImageObject","url":"avatar0.jpg"}},"url":"https://mrswolf.github.io/zh-cn/2019/01/08/（六）Psychopy事件响应/","keywords":"psychopy"}</script>
+    <meta name="description" content="Psychopy事件响应Psychopy提供了很多IO交互方式，当然，最根本的还是键盘和鼠标。本节介绍Psychopy鼠标和键盘的编程技巧。">
+<meta name="keywords" content="psychopy,事件响应">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="（六）Psychopy事件响应">
+<meta property="og:url" content="https://mrswolf.github.io/zh-cn/2019/01/08/（六）Psychopy事件响应/index.html">
+<meta property="og:site_name" content="swolf的博客">
+<meta property="og:description" content="Psychopy事件响应Psychopy提供了很多IO交互方式，当然，最根本的还是键盘和鼠标。本节介绍Psychopy鼠标和键盘的编程技巧。">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:updated_time" content="2019-01-08T09:01:30.776Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="（六）Psychopy事件响应">
+<meta name="twitter:description" content="Psychopy事件响应Psychopy提供了很多IO交互方式，当然，最根本的还是键盘和鼠标。本节介绍Psychopy鼠标和键盘的编程技巧。">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://mrswolf.github.io/assets/images/avatar0.jpg"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-du2xmrqdqrl2ollgeiw050kpl6l4nbyz7bumjuurjgsxyopifvukebxc9lqe.min.css">
+    <!--STYLES END-->
+    
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-129079661-1', 'auto');
+        ga('send', 'pageview');
+    </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+    
+</head>
+
+    <body>
+        <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="5">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">swolf的博客</a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about">
+        
+        
+            <img class="header-picture" src="/assets/images/avatar0.jpg" alt="作者的图片">
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="5">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar0.jpg" alt="作者的图片">
+                </a>
+                <h4 class="sidebar-profile-name">swolf</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>生物医学工程在读博士，主要研究方向为脑机接口、机器学习和神经科学理论</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/ " title="首页">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">首页</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="分类">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">分类</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="标签">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">标签</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="归档">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">归档</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/about" title="关于我">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">关于我</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/Mrswolf" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="5"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            （六）Psychopy事件响应
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2019-01-08T17:01:30+08:00">
+	
+		    1月 08, 2019
+    	
+    </time>
+    
+        <span>发布在 </span>
+        
+    <a class="category-link" href="/categories/psychopy系列/">psychopy系列</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <h1 id="table-of-contents">目录</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Psychopy事件响应"><span class="toc-text">Psychopy事件响应</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#全局按键响应"><span class="toc-text">全局按键响应</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#等待按键和检测按键"><span class="toc-text">等待按键和检测按键</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#鼠标事件"><span class="toc-text">鼠标事件</span></a></li></ol></li></ol>
+<h2 id="Psychopy事件响应"><a href="#Psychopy事件响应" class="headerlink" title="Psychopy事件响应"></a>Psychopy事件响应</h2><p>Psychopy提供了很多IO交互方式，当然，最根本的还是键盘和鼠标。本节介绍Psychopy鼠标和键盘的编程技巧。<br><a id="more"></a></p>
+<h3 id="全局按键响应"><a href="#全局按键响应" class="headerlink" title="全局按键响应"></a>全局按键响应</h3><p>编写刺激界面免不了要反复调试，要看看字体颜色对不对、图形大小合不合适，一旦发现刺激界面需要改进就得退出程序修改源代码。</p>
+<p>如果采用普通的按键检测方式，则需要在一个循环体内检查按键状态，这显然有可能造成不可知的错误（比如在检测按键前进入一个死循环函数，程序永远无法退出啦），这个时候全局按键响应就很有用了。</p>
+<p>Psychopy用<a href="https://github.com/psychopy/psychopy/blob/master/psychopy/event.py" target="_blank" rel="noopener">psychopy.event.globalkeys</a>来设置全局按键，官方文档里没有如何使用全局按键的说明，但在coder的Demo里有演示global_event_keys.py。</p>
+<p>global_event.keys.py程序注册了三个按键，按键“b”调用python的setattr函数，设置rect对象的填充颜色为蓝色,按键“ctrl”+“r”调用python的setattr函数，设置rect对象的填充颜色为红色。按键“q”调用core.quit方法终止程序退出。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> psychopy <span class="keyword">import</span> core, event, visual, monitors</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__==<span class="string">'__main__'</span>:</span><br><span class="line">    mon = monitors.Monitor(</span><br><span class="line">        name=<span class="string">'my_monitor'</span>,</span><br><span class="line">        width=<span class="number">53.704</span>,  <span class="comment"># 显示器宽度，单位cm</span></span><br><span class="line">        distance=<span class="number">45</span>,   <span class="comment"># 被试距显示器距离，单位cm</span></span><br><span class="line">        gamma=<span class="keyword">None</span>,    <span class="comment"># gamma值</span></span><br><span class="line">        verbose=<span class="keyword">False</span>) <span class="comment"># 是否输出详细信息</span></span><br><span class="line">    mon.setSizePix((<span class="number">1920</span>, <span class="number">1080</span>)) <span class="comment"># 设置显示器分辨率</span></span><br><span class="line">    mon.save() <span class="comment"># 保存显示器信息</span></span><br><span class="line"></span><br><span class="line">    win = visual.Window(monitor=mon, size=(<span class="number">800</span>, <span class="number">600</span>), fullscr=<span class="keyword">False</span>,</span><br><span class="line">        screen=<span class="number">0</span>, winType=<span class="string">'pyglet'</span>, units=<span class="string">'norm'</span>, allowGUI=<span class="keyword">False</span>)</span><br><span class="line">    rect = visual.Rect(win, fillColor=<span class="string">'blue'</span>, pos=(<span class="number">0</span>, <span class="number">-0.2</span>))</span><br><span class="line">    text = visual.TextStim(</span><br><span class="line">        win,</span><br><span class="line">        pos=(<span class="number">0</span>, <span class="number">0.5</span>),</span><br><span class="line">        text=(<span class="string">'Press\n\n'</span></span><br><span class="line">              <span class="string">'B for blue rectangle,\n'</span></span><br><span class="line">              <span class="string">'CTRL + R for red rectangle,\n'</span></span><br><span class="line">              <span class="string">'Q or ESC to quit.'</span>))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Add an event key.</span></span><br><span class="line">    event.globalKeys.add(key=<span class="string">'b'</span>, func=setattr,</span><br><span class="line">                         func_args=(rect, <span class="string">'fillColor'</span>, <span class="string">'blue'</span>),</span><br><span class="line">                         name=<span class="string">'blue rect'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Add an event key with a "modifier" (CTRL).</span></span><br><span class="line">    event.globalKeys.add(key=<span class="string">'r'</span>, modifiers=[<span class="string">'ctrl'</span>], func=setattr,</span><br><span class="line">                         func_args=(rect, <span class="string">'fillColor'</span>, <span class="string">'red'</span>),</span><br><span class="line">                         name=<span class="string">'red rect'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Add multiple shutdown keys "at once".</span></span><br><span class="line">    <span class="keyword">for</span> key <span class="keyword">in</span> [<span class="string">'q'</span>, <span class="string">'escape'</span>]:</span><br><span class="line">        event.globalKeys.add(key, func=core.quit)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Print all currently defined global event keys.</span></span><br><span class="line">    print(event.globalKeys)</span><br><span class="line">    print(repr(event.globalKeys))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        text.draw()</span><br><span class="line">        rect.draw()</span><br><span class="line">        win.flip()</span><br></pre></td></tr></table></figure></p>
+<p>以下是event.globalkeys.add()方法的参数介绍<br>event.globalkeys.add(key, func, func_args=(), func_kwargs=None, modifiers=(), name=None)</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left">parameters</th>
+<th style="text-align:left">type</th>
+<th style="text-align:left">description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">key</td>
+<td style="text-align:left">string</td>
+<td style="text-align:left">按键字符串</td>
+</tr>
+<tr>
+<td style="text-align:left">func</td>
+<td style="text-align:left">function</td>
+<td style="text-align:left">按键时执行的函数</td>
+</tr>
+<tr>
+<td style="text-align:left">func_args</td>
+<td style="text-align:left">iterable</td>
+<td style="text-align:left">函数的args参数</td>
+</tr>
+<tr>
+<td style="text-align:left">func_kwargs</td>
+<td style="text-align:left">dict</td>
+<td style="text-align:left">函数的kwargs参数</td>
+</tr>
+<tr>
+<td style="text-align:left">modifiers</td>
+<td style="text-align:left">iterable</td>
+<td style="text-align:left">组合按键字符串列表，例如’shift’,’ctrl’,’alt’,’capslock’,’scrollock’等</td>
+</tr>
+<tr>
+<td style="text-align:left">name</td>
+<td style="text-align:left">string</td>
+<td style="text-align:left">按键事件的名称</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>此外还有event.globalkeys.remove()方法以移除全局按键<br>event.globalkeys.remove(key, modifiers=())</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left">parameters</th>
+<th style="text-align:left">type</th>
+<th style="text-align:left">description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">key</td>
+<td style="text-align:left">string</td>
+<td style="text-align:left">按键字符串</td>
+</tr>
+<tr>
+<td style="text-align:left">modifiers</td>
+<td style="text-align:left">iterable</td>
+<td style="text-align:left">组合按键字符串列表，例如’shift’,’ctrl’,’alt’,’capslock’,’scrollock’等</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="等待按键和检测按键"><a href="#等待按键和检测按键" class="headerlink" title="等待按键和检测按键"></a>等待按键和检测按键</h3><p>除了全局按键响应，Psychopy还提供了等待按键响应和检测按键响应两种方式。</p>
+<p>以下为等待按键函数event.waitKeys()的演示程序，按’esc’或五次其他按键退出程序。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> psychopy <span class="keyword">import</span> core, event, visual, monitors</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__==<span class="string">'__main__'</span>:</span><br><span class="line">    mon = monitors.Monitor(</span><br><span class="line">        name=<span class="string">'my_monitor'</span>,</span><br><span class="line">        width=<span class="number">53.704</span>,  <span class="comment"># 显示器宽度，单位cm</span></span><br><span class="line">        distance=<span class="number">45</span>,   <span class="comment"># 被试距显示器距离，单位cm</span></span><br><span class="line">        gamma=<span class="keyword">None</span>,    <span class="comment"># gamma值</span></span><br><span class="line">        verbose=<span class="keyword">False</span>) <span class="comment"># 是否输出详细信息</span></span><br><span class="line">    mon.setSizePix((<span class="number">1920</span>, <span class="number">1080</span>)) <span class="comment"># 设置显示器分辨率</span></span><br><span class="line">    mon.save() <span class="comment"># 保存显示器信息</span></span><br><span class="line"></span><br><span class="line">    win = visual.Window(monitor=mon, size=(<span class="number">800</span>, <span class="number">600</span>), fullscr=<span class="keyword">False</span>,</span><br><span class="line">        screen=<span class="number">0</span>, winType=<span class="string">'pyglet'</span>, units=<span class="string">'norm'</span>, allowGUI=<span class="keyword">False</span>)</span><br><span class="line">    msg = visual.TextStim(win, text=<span class="string">'press a key\n &lt; esc &gt; to quit'</span>)</span><br><span class="line">    msg.draw()</span><br><span class="line">    win.flip()</span><br><span class="line"></span><br><span class="line">    k = [<span class="string">''</span>]</span><br><span class="line">    count = <span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> k[<span class="number">0</span>] <span class="keyword">not</span> <span class="keyword">in</span> [<span class="string">'escape'</span>, <span class="string">'esc'</span>] <span class="keyword">and</span> count &lt; <span class="number">5</span>:</span><br><span class="line">        k = event.waitKeys()</span><br><span class="line">        print(k)</span><br><span class="line">        count += <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    win.close()</span><br><span class="line">    core.quit()</span><br></pre></td></tr></table></figure></p>
+<p>event.waitKeys()阻塞函数进程直到被试按键，以下是<a href="http://www.psychopy.org/api/event.html" target="_blank" rel="noopener">event.waitKeys()</a>方法的参数介绍<br>event.waitKeys(maxWait=inf, keyList=None, modifiers=False, timeStamped=False, clearEvents=True)</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left">parameters</th>
+<th style="text-align:left">type</th>
+<th style="text-align:left">description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">maxWait</td>
+<td style="text-align:left">numeric value</td>
+<td style="text-align:left">最大等待时间，默认为inf</td>
+</tr>
+<tr>
+<td style="text-align:left">keyList</td>
+<td style="text-align:left">iterable</td>
+<td style="text-align:left">指定函数检测的按键名称，函数仅在按指定键时返回</td>
+</tr>
+<tr>
+<td style="text-align:left">modifiers</td>
+<td style="text-align:left">bool</td>
+<td style="text-align:left">如果True，返回(keyname, modifiers)的tuple</td>
+</tr>
+<tr>
+<td style="text-align:left">timeStamped</td>
+<td style="text-align:left">bool</td>
+<td style="text-align:left">如果True，返回(keyname, time)</td>
+</tr>
+<tr>
+<td style="text-align:left">clearEvents</td>
+<td style="text-align:left">bool</td>
+<td style="text-align:left">如果True，在检测新的按键前清理event buffer</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left">return</th>
+<th style="text-align:left">type</th>
+<th style="text-align:left">description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">keys</td>
+<td style="text-align:left">iterable</td>
+<td style="text-align:left">按键列表；超时返回None</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>等待按键会阻塞进程，Psychopy还提供了另一种非阻塞检测方式<a href="http://www.psychopy.org/api/event.html" target="_blank" rel="noopener">event.getKeys()</a>。</p>
+<p>以下代码如下不断检测按键并输出，直到按’escape’键退出程序。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> psychopy <span class="keyword">import</span> core, event, visual, monitors</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__==<span class="string">'__main__'</span>:</span><br><span class="line">    mon = monitors.Monitor(</span><br><span class="line">        name=<span class="string">'my_monitor'</span>,</span><br><span class="line">        width=<span class="number">53.704</span>,  <span class="comment"># 显示器宽度，单位cm</span></span><br><span class="line">        distance=<span class="number">45</span>,   <span class="comment"># 被试距显示器距离，单位cm</span></span><br><span class="line">        gamma=<span class="keyword">None</span>,    <span class="comment"># gamma值</span></span><br><span class="line">        verbose=<span class="keyword">False</span>) <span class="comment"># 是否输出详细信息</span></span><br><span class="line">    mon.setSizePix((<span class="number">1920</span>, <span class="number">1080</span>)) <span class="comment"># 设置显示器分辨率</span></span><br><span class="line">    mon.save() <span class="comment"># 保存显示器信息</span></span><br><span class="line"></span><br><span class="line">    win = visual.Window(monitor=mon, size=(<span class="number">800</span>, <span class="number">600</span>), fullscr=<span class="keyword">False</span>,</span><br><span class="line">        screen=<span class="number">0</span>, winType=<span class="string">'pyglet'</span>, units=<span class="string">'norm'</span>, allowGUI=<span class="keyword">False</span>)</span><br><span class="line">    msg = visual.TextStim(win, text=<span class="string">'press a key\n &lt; esc &gt; to quit'</span>)</span><br><span class="line">    msg.draw()</span><br><span class="line">    win.flip()</span><br><span class="line"></span><br><span class="line">    count = <span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        k = event.getKeys()</span><br><span class="line">        <span class="keyword">if</span> k:</span><br><span class="line">            <span class="keyword">if</span> <span class="string">'escape'</span> <span class="keyword">in</span> k:</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            print(k)</span><br><span class="line"></span><br><span class="line">    win.close()</span><br><span class="line">    core.quit()</span><br></pre></td></tr></table></figure></p>
+<p>以下是<a href="http://www.psychopy.org/api/event.html" target="_blank" rel="noopener">event.getKeys()</a>方法的参数介绍<br>event.getKeys(keyList=None, modifiers=False, timeStamped=False)</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left">parameters</th>
+<th style="text-align:left">type</th>
+<th style="text-align:left">description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">keyList</td>
+<td style="text-align:left">iterable</td>
+<td style="text-align:left">指定函数检测的按键名称，函数仅在按指定键时返回</td>
+</tr>
+<tr>
+<td style="text-align:left">modifiers</td>
+<td style="text-align:left">bool</td>
+<td style="text-align:left">如果True，返回(keyname, modifiers)的tuple</td>
+</tr>
+<tr>
+<td style="text-align:left">timeStamped</td>
+<td style="text-align:left">bool</td>
+<td style="text-align:left">如果True，返回(keyname, time)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left">return</th>
+<th style="text-align:left">type</th>
+<th style="text-align:left">description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">keys</td>
+<td style="text-align:left">iterable</td>
+<td style="text-align:left">按键列表；超时返回None</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="鼠标事件"><a href="#鼠标事件" class="headerlink" title="鼠标事件"></a>鼠标事件</h3><p>Psychopy提供<a href="http://www.psychopy.org/api/event.html" target="_blank" rel="noopener">event.Mouse</a>类来处理鼠标相关的事件，官方文档对此有详细的介绍。以下的代码显示了一个含有矩形的窗，在矩形内部单击左右键可以改变颜色，而按中央滚轮键则退出程序。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> psychopy <span class="keyword">import</span> core, event, visual, monitors</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__==<span class="string">'__main__'</span>:</span><br><span class="line">    mon = monitors.Monitor(</span><br><span class="line">        name=<span class="string">'my_monitor'</span>,</span><br><span class="line">        width=<span class="number">53.704</span>,  <span class="comment"># 显示器宽度，单位cm</span></span><br><span class="line">        distance=<span class="number">45</span>,   <span class="comment"># 被试距显示器距离，单位cm</span></span><br><span class="line">        gamma=<span class="keyword">None</span>,    <span class="comment"># gamma值</span></span><br><span class="line">        verbose=<span class="keyword">False</span>) <span class="comment"># 是否输出详细信息</span></span><br><span class="line">    mon.setSizePix((<span class="number">1920</span>, <span class="number">1080</span>)) <span class="comment"># 设置显示器分辨率</span></span><br><span class="line">    mon.save() <span class="comment"># 保存显示器信息</span></span><br><span class="line"></span><br><span class="line">    win = visual.Window(monitor=mon, size=(<span class="number">800</span>, <span class="number">600</span>), fullscr=<span class="keyword">False</span>,</span><br><span class="line">        screen=<span class="number">0</span>, winType=<span class="string">'pyglet'</span>, units=<span class="string">'norm'</span>, allowGUI=<span class="keyword">True</span>)</span><br><span class="line">    rect = visual.Rect(win, fillColor=<span class="string">'blue'</span>, pos=(<span class="number">0</span>, <span class="number">0</span>))</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 创建Mouse类</span></span><br><span class="line">    mouse = event.Mouse(visible=<span class="keyword">True</span>, newPos=(<span class="number">0</span>, <span class="number">0</span>), win=win)</span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        <span class="comment"># 重置单击事件状态</span></span><br><span class="line">        mouse.clickReset()</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 检测左键是否在矩形内单击</span></span><br><span class="line">        <span class="keyword">if</span> mouse.isPressedIn(rect, buttons=[<span class="number">0</span>]):</span><br><span class="line">            rect.fillColor = <span class="string">'red'</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 检测右键是否在矩形内单击</span></span><br><span class="line">        <span class="keyword">if</span> mouse.isPressedIn(rect, buttons=[<span class="number">2</span>]):</span><br><span class="line">            rect.fillColor = <span class="string">'blue'</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 检测是否单击滚轮键</span></span><br><span class="line">        <span class="comment"># button1: left click</span></span><br><span class="line">        <span class="comment"># button2: middle click</span></span><br><span class="line">        <span class="comment"># button3: right click</span></span><br><span class="line">        button1, button2, button3 = mouse.getPressed(getTime=<span class="keyword">False</span>)</span><br><span class="line">        <span class="keyword">if</span> button2:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        </span><br><span class="line">        rect.draw()</span><br><span class="line">        win.flip()</span><br><span class="line"></span><br><span class="line">    core.quit()</span><br></pre></td></tr></table></figure>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">标签</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/psychopy/">psychopy</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/zh-cn/2019/01/06/详解CSP/" data-tooltip="详解CSP（持续更新中）" aria-label="下一篇: 详解CSP（持续更新中）">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="目录">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2019 swolf. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="5">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/zh-cn/2019/01/06/详解CSP/" data-tooltip="详解CSP（持续更新中）" aria-label="下一篇: 详解CSP（持续更新中）">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="目录">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                <div id="share-options-bar" class="share-options-bar" data-behavior="5">
+    <i id="btn-close-shareoptions" class="fa fa-times"></i>
+    <ul class="share-options">
+        
+    </ul>
+</div>
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar0.jpg" alt="作者的图片">
+        
+            <h4 id="about-card-name">swolf</h4>
+        
+            <div id="about-card-bio"><p>生物医学工程在读博士，主要研究方向为脑机接口、机器学习和神经科学理论</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>目前失业中…</p>
+
+            </div>
+        
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cyberpunk.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-vufjrm3fmbuttogo1hxuu0w9w0sesk5iyysjuguc2hdhufot9szxg8twijry.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script>
+             var disqus_config = function () {
+                 this.page.url = 'https://mrswolf.github.io/zh-cn/2019/01/08/（六）Psychopy事件响应/';
+                 
+                    this.page.identifier = 'zh-cn/2019/01/08/（六）Psychopy事件响应/';
+                 
+             };
+            (function() {
+                var d = document, s = d.createElement('script');
+                var disqus_shortname = 'mrswolf-github-io';
+                s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+    
+
+
+
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<!-- <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>
