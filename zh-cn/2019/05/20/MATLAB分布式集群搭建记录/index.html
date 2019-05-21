@@ -1,0 +1,453 @@
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+    
+<head>
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="swolf的博客">
+    <title>MATLAB分布式集群搭建记录 - swolf的博客</title>
+    <meta name="author" content="swolf">
+    
+        <meta name="keywords" content="脑机接口,神经科学,机器学习,swolf,计算机,脑科学,Python,深度学习,matlab,mdce">
+    
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"swolf","sameAs":["/about","https://github.com/Mrswolf"],"image":"avatar0.jpg"},"articleBody":"\nMATLAB分布式集群搭建记录虽然我很久不用MATLAB处理日常工作，但是实验室主流依然是MATLAB（用Python的就那么几个T_T)。以前小伙伴们跑程序都是拷贝程序和数据到实验室的计算服务器上，手工开N个MATLAB窗口做运算。现在实验室规模扩大，这种手工的方式越来越繁琐。我从前用MATLAB时就想试试集群计算，奈何当时实验室没啥硬件条件，正好现在有机会，我干脆搭了个MATLAB集群供小伙伴使用。\n软硬件硬件方面：\n\n4核心, 16GB内存， 百兆网卡普通台式机(manage节点)\n40核心, 128GB内存, 千兆网卡计算服务器(compute1节点)\n346TB存储， 千兆网卡存储服务器(storage节点)\n\n软件方面：\n\nWindows10专业版系统\ncentos7\nmatlab2017b\n\n网络环境：\n\n192.168.130.12(matlab-manage.xxx.org) — manage节点\n192.168.130.11(matlab-compute1.xxx.org) — compute1节点\n192.168.130.10 — storage节点\n\nMATLAB的帮助文档中提出，想要使用集群计算服务应该满足以下条件：\n\n推荐一个CPU核心最多创建一个worker\n推荐每个worker最少可以使用2GB内存\n最少5GB的硬盘空间容纳暂时性的数据文件\n计算集群之间应当使用同构的计算架构(要求计算节点的硬件配置、系统和软件配置一致)\n\n集群安装配置ip域名设置修改compute节点和manage节点的计算机名、ip地址以及DNS域名解析，例如compute1节点的计算机名为matlab-compute1.xxx.org(xxx.org为后缀域名)，DNS域名也应该为matlab-compute1.xxx.org，ip地址为192.168.130.11。\nMATLAB分布式计算服务似乎要求计算机名要添加后缀域名(xxx.org)，否则在集群测试时会有解析不匹配的警告，Windows专业版可在这台电脑-属性-更改设置-更改-其他中添加主DNS后缀。\n\nmanage节点在manage节点安装matlab2017b，manage节点在安装过程中应该勾选MATLAB License Server和MATLAB Distributed Computing Server工具箱，前者为集群提供license认证服务，后者是分布式计算的核心服务组件。对于破解版的MATLAB，应该输入floating license的key而不是standalone的key，才能安装MATLAB License Server。安装完毕（并破解）后，在Windows服务选项卡中启动MATLAB License Server服务。同时修改C:\\Program Files\\MATLAB\\R2017b\\licenses\\network.lic为如下内容SERVER this_host ANYUSE_SERVER\n修改C:\\Program Files\\MATLAB\\R2017b\\toolbox\\distcomp\\bin\\mdce_def.bat其中的security level为2set SECURITY_LEVEL=2\n设置security level为2的效果是要求用户在使用分布式计算服务时输入用户名，从而可以监控集群使用情况。\n\n启动MATLAB，切换到C:\\Program Files\\MATLAB\\R2017b\\toolbox\\distcomp\\bin目录下，在MATLAB命令行窗口输入如下命令安装并启动mdce服务!mdce install !mdce start\n最好在MATLAB命令行窗口内启动mdce服务，如果在Windows服务选项卡中启动服务，会出现权限问题导致集群worker无法连接。\n\n启动mdce服务后最好双击运行C:\\Program Files\\MATLAB\\R2017b\\toolbox\\distcomp\\bin\\addMatlabToWindowsFirewall.bat文件（我的做法是直接关闭Windows防火墙避免多余的问题）\ncompute节点compute节点的安装配置同manage节点，仅以下内容不同\n\n安装matlab时无需勾选MATLAB License Server工具箱\n修改C:\\Program Files\\MATLAB\\R2017b\\licenses\\network.lic为如下内容SERVER matlab-manage.xxx.org ANYUSE_SERVER\n\n\n此外为了跟storage节点连接，compute节点需要安装NFS服务，在程序和功能-启用或关闭Windows功能中勾选NFS服务\nstorage节点storage节点设置NFS服务，NFS服务端安装和配置网上都有，我就不写了。\n添加集群节点在manage节点运行C:\\Program Files\\MATLAB\\R2017b\\toolbox\\distcomp\\bin\\admincenter.bat，启动管理面板，点击Add or Find，添加manage节点和compute1节点，添加完毕后，点击Test Connectivity，测试通过如下图\n在MATLAB Job Scheduler面板点击start启动scheduler，输入名称，选择scheduler的节点为matlab-manage.xxx.org，因为security level为2，还需要设置管理员的密码。\n设置好scheduler后，右键scheduler点击Start Workers，勾选compute1节点，设置启动的worker数量（我只有40个核心，所以启动40个worker）。\n客户端配置和使用MATLAB集群计算要求客户端的matlab版本和服务端一致，因为我服务端安装的是2017b，客户端也应该是matlab2017b。客户端可以选择standalone安装方式，也需要安装mdce服务添加防火墙配置并启动。如果客户端想直接使用NFS服务，也需要在程序和功能-启用或关闭Windows功能中勾选NFS服务。安装完毕后，在MATLAB主页中的Parallel选项选择Discover Cluster，勾选On your network，点击Next等待发现集群mjs40_2，选择集群，点击Next，Finish，就可以使用集群了，集群的使用情况可以在Parallel选项里Monitor Jobs查看。\n这里提供两个matlab并行计算脚本检测集群配置是否正确%This demo shows how to use distributed computing serverprimeNumbers = primes(uint64(2^21));compositeNumbers = primeNumbers.*primeNumbers(randperm(numel(primeNumbers)));factors = zeros(numel(primeNumbers),2);tic;parfor idx = 1:numel(compositeNumbers)    factors(idx,:) = factor(compositeNumbers(idx));endtoc\n%This demo shows how to load data from nfs server, target_folder is nfs server ip addresstarget_folder='\\\\192.168.130.10\\pub\\data\\';factors=zeros(400,2);tic;parfor i=0:399    tmp = load([target_folder,num2str(i),'.mat']);    data = tmp.data;    factors(i+1, :)=factor(data);endtoc\n","dateCreated":"2019-05-20T14:05:02+08:00","dateModified":"2019-05-21T22:16:26+08:00","datePublished":"2019-05-20T14:05:02+08:00","description":"\nMATLAB分布式集群搭建记录虽然我很久不用MATLAB处理日常工作，但是实验室主流依然是MATLAB（用Python的就那么几个T_T)。以前小伙伴们跑程序都是拷贝程序和数据到实验室的计算服务器上，手工开N个MATLAB窗口做运算。现在实验室规模扩大，这种手工的方式越来越繁琐。我从前用MATLAB时就想试试集群计算，奈何当时实验室没啥硬件条件，正好现在有机会，我干脆搭了个MATLAB集群供小伙伴使用。","headline":"MATLAB分布式集群搭建记录","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://mrswolf.github.io/zh-cn/2019/05/20/MATLAB分布式集群搭建记录/"},"publisher":{"@type":"Organization","name":"swolf","sameAs":["/about","https://github.com/Mrswolf"],"image":"avatar0.jpg","logo":{"@type":"ImageObject","url":"avatar0.jpg"}},"url":"https://mrswolf.github.io/zh-cn/2019/05/20/MATLAB分布式集群搭建记录/","keywords":"matlab"}</script>
+    <meta name="description" content="MATLAB分布式集群搭建记录虽然我很久不用MATLAB处理日常工作，但是实验室主流依然是MATLAB（用Python的就那么几个T_T)。以前小伙伴们跑程序都是拷贝程序和数据到实验室的计算服务器上，手工开N个MATLAB窗口做运算。现在实验室规模扩大，这种手工的方式越来越繁琐。我从前用MATLAB时就想试试集群计算，奈何当时实验室没啥硬件条件，正好现在有机会，我干脆搭了个MATLAB集群供小伙">
+<meta name="keywords" content="matlab,mdce">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="MATLAB分布式集群搭建记录">
+<meta property="og:url" content="https://mrswolf.github.io/zh-cn/2019/05/20/MATLAB分布式集群搭建记录/index.html">
+<meta property="og:site_name" content="swolf的博客">
+<meta property="og:description" content="MATLAB分布式集群搭建记录虽然我很久不用MATLAB处理日常工作，但是实验室主流依然是MATLAB（用Python的就那么几个T_T)。以前小伙伴们跑程序都是拷贝程序和数据到实验室的计算服务器上，手工开N个MATLAB窗口做运算。现在实验室规模扩大，这种手工的方式越来越繁琐。我从前用MATLAB时就想试试集群计算，奈何当时实验室没啥硬件条件，正好现在有机会，我干脆搭了个MATLAB集群供小伙">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:image" content="https://mrswolf.github.io/zh-cn/2019/05/20/MATLAB分布式集群搭建记录/license.png">
+<meta property="og:image" content="https://mrswolf.github.io/zh-cn/2019/05/20/MATLAB分布式集群搭建记录/nfs.png">
+<meta property="og:image" content="https://mrswolf.github.io/zh-cn/2019/05/20/MATLAB分布式集群搭建记录/connectivity.png">
+<meta property="og:image" content="https://mrswolf.github.io/zh-cn/2019/05/20/MATLAB分布式集群搭建记录/center.png">
+<meta property="og:updated_time" content="2019-05-21T14:16:26.861Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MATLAB分布式集群搭建记录">
+<meta name="twitter:description" content="MATLAB分布式集群搭建记录虽然我很久不用MATLAB处理日常工作，但是实验室主流依然是MATLAB（用Python的就那么几个T_T)。以前小伙伴们跑程序都是拷贝程序和数据到实验室的计算服务器上，手工开N个MATLAB窗口做运算。现在实验室规模扩大，这种手工的方式越来越繁琐。我从前用MATLAB时就想试试集群计算，奈何当时实验室没啥硬件条件，正好现在有机会，我干脆搭了个MATLAB集群供小伙">
+<meta name="twitter:image" content="https://mrswolf.github.io/zh-cn/2019/05/20/MATLAB分布式集群搭建记录/license.png">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://mrswolf.github.io/assets/images/avatar0.jpg"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-du2xmrqdqrl2ollgeiw050kpl6l4nbyz7bumjuurjgsxyopifvukebxc9lqe.min.css">
+    <!--STYLES END-->
+    
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-129079661-1', 'auto');
+        ga('send', 'pageview');
+    </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+    
+</head>
+
+    <body>
+        <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="5">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/ ">swolf的博客</a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about">
+        
+        
+            <img class="header-picture" src="/assets/images/avatar0.jpg" alt="作者的图片">
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="5">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="/#about">
+                    <img class="sidebar-profile-picture" src="/assets/images/avatar0.jpg" alt="作者的图片">
+                </a>
+                <h4 class="sidebar-profile-name">swolf</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>生物医学工程在读博士，主要研究方向为脑机接口、机器学习和神经科学理论</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/ " title="首页">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">首页</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="分类">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">分类</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="标签">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">标签</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="归档">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">归档</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/about" title="关于我">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">关于我</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/Mrswolf" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="5"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            MATLAB分布式集群搭建记录
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2019-05-20T14:05:02+08:00">
+	
+		    5月 20, 2019
+    	
+    </time>
+    
+        <span>发布在 </span>
+        
+    <a class="category-link" href="/categories/偶尔用用的MATLAB/">偶尔用用的MATLAB</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <h1 id="table-of-contents">目录</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#MATLAB分布式集群搭建记录"><span class="toc-text">MATLAB分布式集群搭建记录</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#软硬件"><span class="toc-text">软硬件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#集群安装配置"><span class="toc-text">集群安装配置</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ip域名设置"><span class="toc-text">ip域名设置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#manage节点"><span class="toc-text">manage节点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#compute节点"><span class="toc-text">compute节点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#storage节点"><span class="toc-text">storage节点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#添加集群节点"><span class="toc-text">添加集群节点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#客户端配置和使用"><span class="toc-text">客户端配置和使用</span></a></li></ol></li></ol></li></ol>
+<h2 id="MATLAB分布式集群搭建记录"><a href="#MATLAB分布式集群搭建记录" class="headerlink" title="MATLAB分布式集群搭建记录"></a>MATLAB分布式集群搭建记录</h2><p>虽然我很久不用MATLAB处理日常工作，但是实验室主流依然是MATLAB（用Python的就那么几个T_T)。以前小伙伴们跑程序都是拷贝程序和数据到实验室的计算服务器上，手工开N个MATLAB窗口做运算。现在实验室规模扩大，这种手工的方式越来越繁琐。我从前用MATLAB时就想试试集群计算，奈何当时实验室没啥硬件条件，正好现在有机会，我干脆搭了个MATLAB集群供小伙伴使用。<br><a id="more"></a></p>
+<h3 id="软硬件"><a href="#软硬件" class="headerlink" title="软硬件"></a>软硬件</h3><p>硬件方面：</p>
+<ul>
+<li>4核心, 16GB内存， 百兆网卡普通台式机(manage节点)</li>
+<li>40核心, 128GB内存, 千兆网卡计算服务器(compute1节点)</li>
+<li>346TB存储， 千兆网卡存储服务器(storage节点)</li>
+</ul>
+<p>软件方面：</p>
+<ul>
+<li>Windows10专业版系统</li>
+<li>centos7</li>
+<li>matlab2017b</li>
+</ul>
+<p>网络环境：</p>
+<ul>
+<li>192.168.130.12(matlab-manage.xxx.org) — manage节点</li>
+<li>192.168.130.11(matlab-compute1.xxx.org) — compute1节点</li>
+<li>192.168.130.10 — storage节点</li>
+</ul>
+<p>MATLAB的帮助文档中提出，想要使用集群计算服务应该满足以下条件：</p>
+<ul>
+<li>推荐一个CPU核心最多创建一个worker</li>
+<li>推荐每个worker最少可以使用2GB内存</li>
+<li>最少5GB的硬盘空间容纳暂时性的数据文件</li>
+<li>计算集群之间应当使用同构的计算架构(要求计算节点的硬件配置、系统和软件配置一致)</li>
+</ul>
+<h3 id="集群安装配置"><a href="#集群安装配置" class="headerlink" title="集群安装配置"></a>集群安装配置</h3><h4 id="ip域名设置"><a href="#ip域名设置" class="headerlink" title="ip域名设置"></a>ip域名设置</h4><p>修改compute节点和manage节点的计算机名、ip地址以及DNS域名解析，例如compute1节点的计算机名为matlab-compute1.xxx.org(xxx.org为后缀域名)，DNS域名也应该为matlab-compute1.xxx.org，ip地址为192.168.130.11。</p>
+<blockquote><p>MATLAB分布式计算服务似乎要求计算机名要添加后缀域名(xxx.org)，否则在集群测试时会有解析不匹配的警告，Windows专业版可在<strong>这台电脑-属性-更改设置-更改-其他</strong>中添加主DNS后缀。</p>
+</blockquote>
+<h4 id="manage节点"><a href="#manage节点" class="headerlink" title="manage节点"></a>manage节点</h4><p>在manage节点安装matlab2017b，manage节点在安装过程中应该勾选MATLAB License Server和MATLAB Distributed Computing Server工具箱，前者为集群提供license认证服务，后者是分布式计算的核心服务组件。对于破解版的MATLAB，应该输入floating license的key而不是standalone的key，才能安装MATLAB License Server。安装完毕（并破解）后，在Windows服务选项卡中启动MATLAB License Server服务。<br><img src="/zh-cn/2019/05/20/MATLAB分布式集群搭建记录/license.png"><br>同时修改C:\Program Files\MATLAB\R2017b\licenses\network.lic为如下内容<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">SERVER this_host ANY</span><br><span class="line">USE_SERVER</span><br></pre></td></tr></table></figure></p>
+<p>修改C:\Program Files\MATLAB\R2017b\toolbox\distcomp\bin\mdce_def.bat其中的security level为2<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">set SECURITY_LEVEL=2</span><br></pre></td></tr></table></figure></p>
+<blockquote><p>设置security level为2的效果是要求用户在使用分布式计算服务时输入用户名，从而可以监控集群使用情况。</p>
+</blockquote>
+<p>启动MATLAB，切换到C:\Program Files\MATLAB\R2017b\toolbox\distcomp\bin目录下，在MATLAB命令行窗口输入如下命令安装并启动mdce服务<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">!mdce install </span><br><span class="line">!mdce start</span><br></pre></td></tr></table></figure></p>
+<blockquote><p>最好在MATLAB命令行窗口内启动mdce服务，如果在Windows服务选项卡中启动服务，会出现权限问题导致集群worker无法连接。</p>
+</blockquote>
+<p>启动mdce服务后最好双击运行C:\Program Files\MATLAB\R2017b\toolbox\distcomp\bin\addMatlabToWindowsFirewall.bat文件（我的做法是直接关闭Windows防火墙避免多余的问题）</p>
+<h4 id="compute节点"><a href="#compute节点" class="headerlink" title="compute节点"></a>compute节点</h4><p>compute节点的安装配置同manage节点，仅以下内容不同</p>
+<ol>
+<li>安装matlab时无需勾选MATLAB License Server工具箱</li>
+<li>修改C:\Program Files\MATLAB\R2017b\licenses\network.lic为如下内容<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">SERVER matlab-manage.xxx.org ANY</span><br><span class="line">USE_SERVER</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>此外为了跟storage节点连接，compute节点需要安装NFS服务，在<strong>程序和功能-启用或关闭Windows功能</strong>中勾选NFS服务<br><img src="/zh-cn/2019/05/20/MATLAB分布式集群搭建记录/nfs.png"></p>
+<h4 id="storage节点"><a href="#storage节点" class="headerlink" title="storage节点"></a>storage节点</h4><p>storage节点设置NFS服务，NFS服务端安装和配置网上都有，我就不写了。</p>
+<h4 id="添加集群节点"><a href="#添加集群节点" class="headerlink" title="添加集群节点"></a>添加集群节点</h4><p>在manage节点运行C:\Program Files\MATLAB\R2017b\toolbox\distcomp\bin\admincenter.bat，启动管理面板，点击<strong>Add or Find</strong>，添加manage节点和compute1节点，添加完毕后，点击<strong>Test Connectivity</strong>，测试通过如下图<br><img src="/zh-cn/2019/05/20/MATLAB分布式集群搭建记录/connectivity.png"></p>
+<p>在MATLAB Job Scheduler面板点击start启动scheduler，输入名称，选择scheduler的节点为matlab-manage.xxx.org，因为security level为2，还需要设置管理员的密码。</p>
+<p>设置好scheduler后，右键scheduler点击Start Workers，勾选compute1节点，设置启动的worker数量（我只有40个核心，所以启动40个worker）。<br><img src="/zh-cn/2019/05/20/MATLAB分布式集群搭建记录/center.png"></p>
+<h4 id="客户端配置和使用"><a href="#客户端配置和使用" class="headerlink" title="客户端配置和使用"></a>客户端配置和使用</h4><p>MATLAB集群计算要求客户端的matlab版本和服务端一致，因为我服务端安装的是2017b，客户端也应该是matlab2017b。客户端可以选择standalone安装方式，也需要安装mdce服务添加防火墙配置并启动。<br>如果客户端想直接使用NFS服务，也需要在<strong>程序和功能-启用或关闭Windows功能</strong>中勾选NFS服务。<br>安装完毕后，在MATLAB主页中的<strong>Parallel</strong>选项选择<strong>Discover Cluster</strong>，勾选<strong>On your network</strong>，点击Next等待发现集群mjs40_2，选择集群，点击Next，Finish，就可以使用集群了，集群的使用情况可以在<strong>Parallel</strong>选项里<strong>Monitor Jobs</strong>查看。</p>
+<p>这里提供两个matlab并行计算脚本检测集群配置是否正确<br><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line"><span class="comment">%This demo shows how to use distributed computing server</span></span><br><span class="line"></span><br><span class="line">primeNumbers = <span class="built_in">primes</span>(uint64(<span class="number">2</span>^<span class="number">21</span>));</span><br><span class="line">compositeNumbers = primeNumbers.*primeNumbers(randperm(<span class="built_in">numel</span>(primeNumbers)));</span><br><span class="line">factors = <span class="built_in">zeros</span>(<span class="built_in">numel</span>(primeNumbers),<span class="number">2</span>);</span><br><span class="line">tic;</span><br><span class="line"><span class="keyword">parfor</span> idx = <span class="number">1</span>:<span class="built_in">numel</span>(compositeNumbers)</span><br><span class="line">    factors(idx,:) = <span class="built_in">factor</span>(compositeNumbers(idx));</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line">toc</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line"><span class="comment">%This demo shows how to load data from nfs server, target_folder is nfs server ip address</span></span><br><span class="line"></span><br><span class="line">target_folder=<span class="string">'\\192.168.130.10\pub\data\';</span></span><br><span class="line"><span class="string">factors=zeros(400,2);</span></span><br><span class="line"><span class="string">tic;</span></span><br><span class="line"><span class="string">parfor i=0:399</span></span><br><span class="line"><span class="string">    tmp = load([target_folder,num2str(i),'</span>.mat']);</span><br><span class="line">    data = tmp.data;</span><br><span class="line">    factors(<span class="built_in">i</span>+<span class="number">1</span>, :)=<span class="built_in">factor</span>(data);</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line">toc</span><br></pre></td></tr></table></figure>
+
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">标签</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/matlab/">matlab</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/zh-cn/2019/01/08/（六）Psychopy事件响应/" data-tooltip="（六）Psychopy事件响应" aria-label="下一篇: （六）Psychopy事件响应">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="目录">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2019 swolf. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="5">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/zh-cn/2019/01/08/（六）Psychopy事件响应/" data-tooltip="（六）Psychopy事件响应" aria-label="下一篇: （六）Psychopy事件响应">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Diesen Beitrag teilen">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="目录">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                <div id="share-options-bar" class="share-options-bar" data-behavior="5">
+    <i id="btn-close-shareoptions" class="fa fa-times"></i>
+    <ul class="share-options">
+        
+    </ul>
+</div>
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/avatar0.jpg" alt="作者的图片">
+        
+            <h4 id="about-card-name">swolf</h4>
+        
+            <div id="about-card-bio"><p>生物医学工程在读博士，主要研究方向为脑机接口、机器学习和神经科学理论</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>目前失业中…</p>
+
+            </div>
+        
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cyberpunk.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="/assets/js/script-vufjrm3fmbuttogo1hxuu0w9w0sesk5iyysjuguc2hdhufot9szxg8twijry.min.js"></script>
+<!--SCRIPTS END--><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+    
+
+
+
+    </body>
+</html>
