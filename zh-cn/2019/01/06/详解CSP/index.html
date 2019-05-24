@@ -24,7 +24,7 @@
 <meta property="og:site_name" content="swolf的博客">
 <meta property="og:description" content="什么是CSP共空间模式(common spatial pattern,CSP)是脑-机接口领域常用的一类空间滤波算法，尤其在运动想象范式分类上具有较好的效果，是运动想象范式的基准算法之一。目前，CSP及其改进算法的发展速度放缓，看似到达了算法的瓶颈期，近几年没有什么较大的突破。尽管如此，CSP中的一些数学思想对传统脑-机接口算法仍然具有较大的影响力，例如近年运用在SSVEP上的TRCA、DCPM">
 <meta property="og:locale" content="zh-cn">
-<meta property="og:updated_time" content="2019-05-20T06:45:52.354Z">
+<meta property="og:updated_time" content="2019-05-20T06:45:52.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="详解CSP（持续更新中）">
 <meta name="twitter:description" content="什么是CSP共空间模式(common spatial pattern,CSP)是脑-机接口领域常用的一类空间滤波算法，尤其在运动想象范式分类上具有较好的效果，是运动想象范式的基准算法之一。目前，CSP及其改进算法的发展速度放缓，看似到达了算法的瓶颈期，近几年没有什么较大的突破。尽管如此，CSP中的一些数学思想对传统脑-机接口算法仍然具有较大的影响力，例如近年运用在SSVEP上的TRCA、DCPM">
@@ -594,11 +594,27 @@ D_2 = (\Lambda + I)^{-1} \\</script><h4 id="Talk-is-cheap-Show-me-the-code"><a h
 <div id="cover" style="background-image:url('/assets/images/cyberpunk.jpg');"></div>
         <!--SCRIPTS-->
 <script src="/assets/js/script-vufjrm3fmbuttogo1hxuu0w9w0sesk5iyysjuguc2hdhufot9szxg8twijry.min.js"></script>
-<!--SCRIPTS END--><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+<!--SCRIPTS END-->
 
     
 
 
 
-    </body>
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<!-- <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
 </html>
